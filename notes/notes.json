@@ -275,7 +275,7 @@
  },
  "https://github.com/openclaw/openclaw/pull/164860": {
   "bug": "When an agent sends a message without naming where it should go, OpenClaw saves it into the current conversation's own record and sends it nowhere else. The agent was still told \"Sent visible reply to the current source conversation\", so it believed the user on the outside channel had received it. Fixes issue #164732.",
-  "fix": "Only that confirmation text changes, and only for runs that were set to reply through the message tool from the start, like a background task reporting back. Those now hear that the reply was recorded in the session and not sent to an outside channel. A person chatting in the Control UI sees the saved reply on screen, so their agent still hears the old \"Sent visible reply\" text. Where messages go is unchanged.",
+  "fix": "Only that confirmation text changes, and only for turns that come from another agent session, like a background task reporting back. Those now hear that the reply was recorded in the session and not sent to an outside channel. A person chatting in the Control UI sees the saved reply on screen, so their agent still hears the old \"Sent visible reply\" text, whatever their reply settings. Where messages go is unchanged.",
   "headline": "Agent is told a reply was sent when it was only saved"
  },
  "https://github.com/plotly/plotly.py/pull/5779": {
