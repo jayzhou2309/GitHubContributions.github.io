@@ -323,6 +323,11 @@
   "fix": "Whichever input was used last now wins. A key press (left, right, or Enter) clears the mouse's hold on the tooltip and moves it. Moving the mouse again hands control back to the mouse, as before. Just clicking or focusing the chart does not reset the tooltip to the first point. A first version did that by mistake, and an existing test caught it. New tests failed before the change and pass after it. The wider test suite (5000 tests) and the type checks pass.",
   "headline": "Arrow keys move the tooltip even when the mouse rests over the chart"
  },
+ "https://github.com/recharts/recharts/pull/7907": {
+  "bug": "When chart lines each bring their own data and one line starts or ends earlier than another, hovering a spot where the shorter line has no point still listed that line in the tooltip with some other point's value, and drew a stray highlight dot on it (issue #7903). A change in an earlier release made the chart guess a point by position when no point matched, and that guess picked the wrong one.",
+  "fix": "The position-based guess is removed, as planned in the issue thread. A line with no point at the hovered spot now stays out of the tooltip and gets no highlight dot, as it did in version 3.10.0. New tests failed before the change and pass after it. The wider tooltip and chart tests (4382) and the type checks pass. Another open PR (#7083) adds a similar guess in the same place, so the two conflict, and the PR description says so.",
+  "headline": "A chart line with fewer points shows a wrong value in the tooltip"
+ },
  "https://github.com/transact-rs/sqlx/pull/4429": {
   "bug": "a SQLite query using `$0` as a bind parameter panicked instead of returning an error, because SQLite parameter numbers start at 1.",
   "fix": "`sqlx-sqlite/src/arguments.rs` now returns a protocol error for `$0`. A new test, `it_rejects_dollar_zero_parameter` in `tests/sqlite/sqlite.rs`, checks the error and confirms the connection still works afterward.",
