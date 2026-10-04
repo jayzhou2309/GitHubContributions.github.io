@@ -270,7 +270,7 @@
  },
  "https://github.com/openclaw/openclaw/pull/164828": {
   "bug": "When OpenClaw sends a message to Tlon, it turns Markdown into Tlon's rich format. A plain web address or a Markdown image only got converted when it started the line. After other text, the address was sent as plain text and the image as a stray `!` followed by a link. An image inside a heading, quote, or bold text was sent in a shape Tlon does not accept. Fixes issue #164784.",
-  "fix": "The converter now spots addresses and images anywhere in a line. A trailing period or closing bracket is no longer swallowed into a link. Images are pulled out of headings, quotes, and styled text into their own image block, and the surrounding text keeps its style. Eight tests that failed before the fix pass after it.",
+  "fix": "The converter now spots addresses and images anywhere in a line. A trailing period or closing bracket is no longer swallowed into a link, but a closing bracket that pairs with one inside the address stays, as in Wikipedia links like `Function_(mathematics)`. Images are pulled out of headings, quotes, and styled text into their own image block, and the surrounding text keeps its style. Eight tests that failed before the fix pass after it.",
   "headline": "Tlon messages lose links and images that follow text"
  },
  "https://github.com/plotly/plotly.py/pull/5779": {
