@@ -308,6 +308,11 @@
   "fix": "Two places in the string handling copied the line's comments and then added them again. The fix stops the extra copy, so each comment appears once.",
   "headline": "Comments printed twice when long-string handling rewrites a line"
  },
+ "https://github.com/recharts/recharts/pull/7906": {
+  "bug": "Charts can be moved through with the keyboard: arrow keys step the tooltip from one data point to the next. But if the mouse pointer happened to sit still over the chart, the keys did nothing. The tooltip stayed stuck on the point under the mouse, because the chart always let the mouse win over the keyboard (issue #7905). Keyboard users and automated tests that leave the pointer over a chart were both affected.",
+  "fix": "Whichever input was used last now wins. A key press (left, right, or Enter) clears the mouse's hold on the tooltip and moves it. Moving the mouse again hands control back to the mouse, as before. Just clicking or focusing the chart does not reset the tooltip to the first point. A first version did that by mistake, and an existing test caught it. New tests failed before the change and pass after it. The wider test suite (5000 tests) and the type checks pass.",
+  "headline": "Arrow keys move the tooltip even when the mouse rests over the chart"
+ },
  "https://github.com/transact-rs/sqlx/pull/4429": {
   "bug": "a SQLite query using `$0` as a bind parameter panicked instead of returning an error, because SQLite parameter numbers start at 1.",
   "fix": "`sqlx-sqlite/src/arguments.rs` now returns a protocol error for `$0`. A new test, `it_rejects_dollar_zero_parameter` in `tests/sqlite/sqlite.rs`, checks the error and confirms the connection still works afterward.",
