@@ -283,6 +283,11 @@
   "fix": "When the job's wait step gets a helper's finished result, OpenClaw now notes on the helper's record that its result was collected. A quiet ending is accepted when every helper has been collected and none of them owes its own reply. Helpers still running, or ones that reply on their own, keep the old behavior. The note now also sticks when the job restarts its attempt in the middle, for example after the conversation is compacted or the model is switched.",
   "headline": "A silent scheduled job fails after it collects a helper's result"
  },
+ "https://github.com/openclaw/openclaw/pull/165031": {
+  "bug": "When a turn run through the Claude command-line tool is stopped or times out before it finishes, OpenClaw keeps the partial reply. If that partial reply is raw tool-call markup instead of normal text, it was still saved to the chat history as if the assistant had said it, and later turns of the model then see it. A finished turn with the same markup was already refused. Fixes issue #164977.",
+  "fix": "For an interrupted Claude turn, OpenClaw now runs the partial reply through the same check a finished turn gets. Raw tool-call markup is refused and the run ends as a plain stop. Normal partial text is still kept. Other command-line tools are unchanged.",
+  "headline": "An interrupted Claude turn saves raw tool commands into the chat history"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
