@@ -273,6 +273,11 @@
   "fix": "The converter now spots addresses and images anywhere in a line. A trailing period or closing bracket is no longer swallowed into a link, but a closing bracket that pairs with one inside the address stays, as in Wikipedia links like `Function_(mathematics)`. Images are pulled out of headings, quotes, and styled text into their own image block, and the surrounding text keeps its style. Eight tests that failed before the fix pass after it.",
   "headline": "Tlon messages lose links and images that follow text"
  },
+ "https://github.com/openclaw/openclaw/pull/164860": {
+  "bug": "When an agent sends a message without naming where it should go, OpenClaw saves it into the current conversation's own record and sends it nowhere else. The agent was still told \"Sent visible reply to the current source conversation\", so it believed the user on the outside channel had received it. Fixes issue #164732.",
+  "fix": "Only that confirmation text changes. It now says the reply was recorded in the session and that this send did not deliver it to an outside channel. Where messages go is unchanged.",
+  "headline": "Agent is told a reply was sent when it was only saved"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
