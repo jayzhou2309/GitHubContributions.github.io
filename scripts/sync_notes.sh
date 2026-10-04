@@ -3,6 +3,7 @@
 # notes/notes.json and push, so the next Pages build shows the explanations.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+git pull -q --rebase
 python3 scripts/build_data.py --sync-notes
 git add notes/notes.json
 if git diff --cached --quiet; then
