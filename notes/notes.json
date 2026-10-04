@@ -293,6 +293,11 @@
   "fix": "The relay holds the caller's audio (newest five seconds) until the model's session is ready, sends the opening line first, then lets the held audio through. Nothing the caller said is dropped.",
   "headline": "A GPT-Live phone call answers the callee before saying why it called"
  },
+ "https://github.com/openclaw/openclaw/pull/165185": {
+  "bug": "An Incognito session can own a separate working copy of the code (a worktree), for example when it starts a helper that works in its own folder. Deleting that session cleans the folder up. Resetting it does not: the session is gone, but its folder stays on disk and is still listed as in use. Part of issue #159304.",
+  "fix": "Reset now runs the same cleanup step that delete already runs, at the same point. Unsaved work in the folder is saved first. If the folder cannot be removed safely (something is still running in it, or it belongs to someone else), it is kept and a warning is logged. Normal sessions, and sessions with no folder, behave as before.",
+  "headline": "Resetting a private (Incognito) session leaves its work folder behind"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
