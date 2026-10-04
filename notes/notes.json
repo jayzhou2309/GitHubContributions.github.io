@@ -323,6 +323,11 @@
   "fix": "before cancelling, sqlx now asks SQLite whether a transaction is still open. If not, it skips the cancel and still records that the transaction is over. A new test, `it_can_begin_after_sqlite_rolls_back_a_full_transaction`, reproduces the issue and fails without the fix.",
   "headline": "fix(sqlite): keep transaction depth in sync after SQLite rolls back on its own"
  },
+ "https://github.com/unslothai/unsloth/pull/12688": {
+  "bug": "In Unsloth Studio, when you chat through a llama.cpp server added under Settings, the bar that shows how much of the model's context is used always says \"usage not counted yet\". Studio only asks a server to report token counts if that server type is on an allow list, and llama.cpp was not on it. So the server never sent the counts and the bar had nothing to show.",
+  "fix": "llama.cpp is added to the allow list. Its server supports this request, so it now sends token counts and the bar fills. A server added as a generic \"custom\" connection is left alone, because some strict servers reject the request. Changing that needs a per-connection setting, which is a choice for the maintainers. New tests failed before the change and pass after it.",
+  "headline": "The context bar stays empty for llama.cpp connections"
+ },
  "https://github.com/vega/altair/pull/4163": {
   "bug": "When a chart that was already built from other charts had its own filter (a \"transform\"), adding another chart to it with `|`, `&` or `+` placed the new chart inside the same group. The filter then applied to the new chart as well, so it showed the wrong data or came out empty, with no error (issue #3141).",
   "fix": "When the left-hand chart carries a filter, these operators now wrap it as its own group and put the new chart beside it, the same as `alt.hconcat`, `alt.vconcat`, `alt.concat` and `alt.layer` already do. Charts without a filter combine exactly as before. New tests failed before the change and pass after it, the full test suite passes, and all 308 gallery examples produce identical output.",
