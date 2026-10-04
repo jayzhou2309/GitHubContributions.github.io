@@ -288,6 +288,11 @@
   "fix": "For an interrupted Claude turn, OpenClaw now runs the partial reply through the same check a finished turn gets. Raw tool-call markup is refused and the run ends as a plain stop. Normal partial text is still kept. Other command-line tools are unchanged.",
   "headline": "An interrupted Claude turn saves raw tool commands into the chat history"
  },
+ "https://github.com/openclaw/openclaw/pull/165147": {
+  "bug": "On an outbound GPT-Live voice call through the gateway relay, the person who picks up says \"hello\" and that audio reaches the model before the opening line does. The assistant answers them without knowing why it called, then repeats or garbles its greeting. Fixes issue #164979.",
+  "fix": "The relay holds the caller's audio (newest five seconds) until the model's session is ready, sends the opening line first, then lets the held audio through. Nothing the caller said is dropped.",
+  "headline": "A GPT-Live phone call answers the callee before saying why it called"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
