@@ -278,6 +278,11 @@
   "fix": "Only that confirmation text changes, and only for turns that come from another agent session, like a background task reporting back. Those now hear that the reply was recorded in the session and not sent to an outside channel. A person chatting in the Control UI sees the saved reply on screen, so their agent still hears the old \"Sent visible reply\" text, whatever their reply settings. Where messages go is unchanged.",
   "headline": "Agent is told a reply was sent when it was only saved"
  },
+ "https://github.com/openclaw/openclaw/pull/164949": {
+  "bug": "A scheduled job that is allowed to finish without posting anything can start a helper agent, wait for the helper's result, and then end quietly. OpenClaw saw that a helper had been started and treated the quiet ending as a failure: \"Agent couldn't generate a response\". It did not track whether the job had already collected the helper's result. Fixes issue #164887.",
+  "fix": "When the job's wait step gets a helper's finished result, OpenClaw now notes on the helper's record that its result was collected. A quiet ending is accepted when every helper has been collected and none of them owes its own reply. Helpers still running, or ones that reply on their own, keep the old behavior. The note now also sticks when the job restarts its attempt in the middle, for example after the conversation is compacted or the model is switched.",
+  "headline": "A silent scheduled job fails after it collects a helper's result"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
