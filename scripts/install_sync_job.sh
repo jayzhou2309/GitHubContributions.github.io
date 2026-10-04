@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-# Install (or reinstall) a launchd job that runs sync_notes.sh every hour.
+# Install (or reinstall) a launchd job that starts a Pages build every hour, so
+# PR states stay current even when GitHub skips the workflow's cron. It calls gh
+# directly: macOS blocks launchd jobs from reading ~/Documents, where this repo
+# lives. Notes sync separately, from oss-grind's after-tick hook.
 # Uninstall: launchctl bootout gui/$(id -u)/com.jayzhou2309.contributions-sync
 set -euo pipefail
-REPO="$(cd "$(dirname "$0")/.." && pwd)"
 LABEL=com.jayzhou2309.contributions-sync
+REPO_SLUG=jayzhou2309/GitHubContributions.github.io
+GH="$(command -v gh)"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 LOG="$HOME/Library/Logs/contributions-sync.log"
 mkdir -p "$(dirname "$PLIST")"
@@ -14,9 +18,7 @@ cat > "$PLIST" <<PLIST
 <dict>
   <key>Label</key><string>$LABEL</string>
   <key>ProgramArguments</key>
-  <array><string>/bin/bash</string><string>$REPO/scripts/sync_notes.sh</string></array>
-  <key>EnvironmentVariables</key>
-  <dict><key>PATH</key><string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string></dict>
+  <array><string>$GH</string><string>workflow</string><string>run</string><string>pages.yml</string><string>-R</string><string>$REPO_SLUG</string></array>
   <key>StartInterval</key><integer>3600</integer>
   <key>RunAtLoad</key><true/>
   <key>StandardOutPath</key><string>$LOG</string>
