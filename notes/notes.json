@@ -268,6 +268,11 @@
   "fix": "The update record now keeps the updater's own refusal reason (such as `update-recovery-pending` or `candidate-validation-failed`) instead of overwriting it with the generic one. Recovery and restart behavior are unchanged.",
   "headline": "A refused update shows a generic reason"
  },
+ "https://github.com/openclaw/openclaw/pull/164828": {
+  "bug": "When OpenClaw sends a message to Tlon, it turns Markdown into Tlon's rich format. A plain web address or a Markdown image only got converted when it started the line. After other text, the address was sent as plain text and the image as a stray `!` followed by a link. An image inside a heading, quote, or bold text was sent in a shape Tlon does not accept. Fixes issue #164784.",
+  "fix": "The converter now spots addresses and images anywhere in a line. A trailing period or closing bracket is no longer swallowed into a link. Images are pulled out of headings, quotes, and styled text into their own image block, and the surrounding text keeps its style. Eight tests that failed before the fix pass after it.",
+  "headline": "Tlon messages lose links and images that follow text"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
