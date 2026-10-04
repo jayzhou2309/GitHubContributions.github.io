@@ -1,0 +1,321 @@
+{
+ "https://github.com/MemPalace/mempalace/pull/2649": {
+  "bug": "when a Claude Code session stopped or ended, one hook run saved the project's memory in two different places. The conversation went under `herdmates`, but the diary checkpoint went under `wing_herdmates`. Nothing flagged the split, so the project's memories were scattered (issue #2299).",
+  "fix": "the stop and session-end hooks now file the diary under the same name as the conversation. Old diary entries stay where they are and can still be read. A new test fails without the fix and passes with it, and three older tests were updated to the new names.",
+  "headline": "fix(hooks): file the diary checkpoint under the transcript's wing"
+ },
+ "https://github.com/MemPalace/mempalace/pull/2670": {
+  "bug": "once a search word matched more than 500 saved notes, the keyword half of search only looked at the 500 oldest ones. A strong match saved later was never scored, so it could go missing from the results (issue #2667).",
+  "fix": "the keyword search now takes the 500 best matches, not the 500 oldest, before scoring them. A new test saves 600 filler notes and then the right one, and checks that the right one comes first. It fails without the fix and passes with it. The full test suite passes.",
+  "headline": "fix(search): rank the unfiltered lexical window before capping it"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/127061": {
+  "bug": "After an update, Hermes checks its `state.db` database. If the check fails, it copies the pre-update snapshot back over it. On macOS, a database that another process held locked failed the check. The step that should spot that other process only worked on Linux, so Hermes copied the old snapshot over the healthy database and lost the newer rows (issue #127010, reported by Froraut).",
+  "fix": "The guard now uses a holder scan that works on Linux, macOS and Windows. If something still holds the database, Hermes refuses to restore and names the process. If nothing holds it, the restore runs as before. The refusal message no longer says \"restored copy also failed\" when nothing was copied.",
+  "headline": "Update guard overwrote a healthy database on macOS"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/127162": {
+  "bug": "Each skill is a `SKILL.md` file that starts with a header listing its name, description, and limits such as which platforms it runs on. When Hermes built its list of skills, it read only the first 4000 characters of each file. If the header ran longer than that, Hermes saw no header at all. The skill then lost its limits, so it showed up everywhere, and it got the wrong name and description (issue #127106).",
+  "fix": "Hermes now reads the whole header when it builds the skill list. A new test with two skills whose headers run past 5000 characters failed before the fix and passes after it.",
+  "headline": "Skills with long headers lost their platform limits"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/127404": {
+  "bug": "When a chat platform's live-typing helper received nothing during a reply, Hermes still logged a \"possible duplicate send\" warning, once per reply. Users got exactly one message each time, so the warning was a false alarm. It trained operators to ignore the one warning meant to catch real double messages (issue #127395, seen on Feishu).",
+  "fix": "The warning now fires only if the live-typing helper actually put text in the chat this turn. A later fix keeps the warning when a reply was split into several messages, since the first part is already in the chat even after the helper resets for the next part.",
+  "headline": "False \"possible duplicate send\" warning on every reply"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/127790": {
+  "bug": "Hermes lets you give a model a short nickname (an alias such as `ds`) and set that nickname as your default model. Chat translates the nickname into the real model name. The background helper tasks (goal checks, compression, memory flush, image reading) did not. They sent the literal nickname to the provider, which rejected it, and the goal loop paused itself after five failures (issue #127785).",
+  "fix": "The background tasks now look the nickname up the same way chat does and use the real model name, endpoint, and key it points to. That covers the normal automatic route, the image route, and the last-resort fallback that runs after a configured helper provider fails.",
+  "headline": "Background tasks sent a model nickname instead of the real model name"
+ },
+ "https://github.com/QuantConnect/Lean/pull/9840": {
+  "bug": "on a cash account, when a stock was delisted, the engine sold it but the sale money never settled. The settlement step only looked at securities still in the algorithm, and the delisted one had just been removed. The money stayed \"unsettled\" for the rest of the backtest, so the strategy could not spend it (issue #9838).",
+  "fix": "the hourly settlement step now also looks at delisted and removed securities until their pending money has settled. Margin interest is unchanged. A new test covers a cash account holding a stock through a delisting.",
+  "headline": "Settle delisting liquidation proceeds on cash accounts"
+ },
+ "https://github.com/QuantConnect/Lean/pull/9844": {
+  "bug": "if reading a cached data file failed once (for example after the file was replaced on disk), Lean kept handing back the same broken cached copy, so that file read as \"no data\" for the rest of the run (issue #9841).",
+  "fix": "after a failed read, the broken cached copy is dropped, so the next request opens the file fresh.",
+  "headline": "Evict a cached zip whose read fails so the next fetch re-opens it (closed)"
+ },
+ "https://github.com/agno-agi/agno/pull/10644": {
+  "bug": "To compute metrics, agno loaded every session in the time window and then sent all of their ids back to the database as one long list of query parameters. With enough sessions the database refuses the query: SQLite fails with \"too many SQL variables\", and async Postgres fails past 65,535 parameters. On Postgres the error is swallowed, so metrics quietly report zero sessions.",
+  "fix": "Let the database pick the ids itself with a subquery built from the same session filter, so the query stays the same size no matter how many sessions there are. The change covers all seven SQL storage adapters.",
+  "headline": "Metrics refresh breaks on large session tables"
+ },
+ "https://github.com/agno-agi/agno/pull/10721": {
+  "bug": "When a session's first run has no saved messages (for example a run that crashed early), agno names the session from the run's input. That input is stored as a small record, and agno turned the whole record into text, so the session list showed something like `{\"input_content\": \"Why is it slow?\", ...}` instead of \"Why is it slow?\".",
+  "fix": "Pull the message text out of the record before using it as the name, the same way another helper in that file already does. Inputs stored in other shapes behave as before.",
+  "headline": "Session names show raw JSON instead of the user's message"
+ },
+ "https://github.com/apache/echarts/pull/21767": {
+  "bug": "A map chart that reads its data from a `dataset` with `seriesLayoutBy: 'row'` throws an error and draws nothing (issue #21520). The map code always adds the regions that have no data, and that step is not allowed for row-laid-out data, even when there is nothing to add. A dataset that leaves some regions out could also lose region names.",
+  "fix": "The map code only adds missing regions when there are some, and adds them in a way that works for both layouts. Region names stay correct. A unit test covers both cases.",
+  "headline": "Map chart fails when its data is laid out by row"
+ },
+ "https://github.com/apache/echarts/pull/21768": {
+  "bug": "A piecewise `visualMap` that colors points by category stops working when the same field is also on a category axis (issue #21236). The chart stores that field as position numbers (0, 1, ...) instead of the category names, so no piece ever matches and the series disappears.",
+  "fix": "When the field is on a category axis, the visualMap code turns the stored number back into the category name before matching. A unit test covers it.",
+  "headline": "Piecewise visualMap ignores categories on a category axis"
+ },
+ "https://github.com/apache/echarts/pull/21776": {
+  "bug": "On a polar chart, setting `radiusAxis.axisTick.inside` or `radiusAxis.axisLabel.inside` does nothing (issue #17434). The radius axis always drew ticks and labels on the same side and never read the option. The other axis types already respect it.",
+  "fix": "The radius axis now reads both options and flips ticks and labels to the other side when they are set, the same way the other axes do. A unit test checks both settings.",
+  "headline": "Radius axis ignores the \"inside\" option for ticks and labels"
+ },
+ "https://github.com/celery/celery/pull/10750": {
+  "bug": "With `task_always_eager` on, a group that holds a chain ending in another group still connected to the result backend. If Redis was down, the whole call failed with a retry-limit error, even though eager mode should never need the backend.",
+  "fix": "When a group runs eagerly, it no longer \"freezes\" its members first. Freezing was what built the inner group's result and subscribed to the backend, and the eager path threw that result away anyway. The normal async path is unchanged.",
+  "headline": "Eager nested groups touch the result backend"
+ },
+ "https://github.com/denoland/deno/pull/36935": {
+  "bug": "When a text value stored in SQLite contained a zero character (`\"a\\0b\"`), Deno's `node:sqlite` returned only the part before it (`\"a\"`). The data in the database was fine. Only reading it back lost the rest. Node returns the whole string.",
+  "fix": "Deno now asks SQLite how long the text is and reads exactly that many bytes, instead of stopping at the first zero. Another part of the same module already read text this way.",
+  "headline": "node:sqlite cuts text off at a hidden zero character"
+ },
+ "https://github.com/denoland/deno/pull/36936": {
+  "bug": "Deno's lint plugin types say a `BinaryExpression` node can have the operator `||`. It never can: Deno reports `a || b` as a `LogicalExpression`, like `&&` and `??`. A plugin that checks for `||` on a `BinaryExpression` type-checks fine but never matches anything.",
+  "fix": "`||` is removed from the `BinaryExpression` operator list. A new test checks that a `BinaryExpression` visitor never sees `||`. It also makes the type check fail if `||` is ever added back. The lint plugin tests pass (110 passed, 0 failed).",
+  "headline": "Lint plugin types list `||` as a binary operator"
+ },
+ "https://github.com/denoland/deno/pull/36951": {
+  "bug": "In a workspace where the npm packages sit in the root `node_modules` folder, Deno's editor support (`deno lsp`) could load the same type file under two different names. Which name it got depended on which file imported it. TypeScript then treats the two copies as different types, so a class with private fields is \"not assignable to itself\" and the editor shows a red error. `deno check` on the command line reports nothing, because only the editor had the bug.",
+  "fix": "Whether a `node_modules` file gets the special `$node_modules` name now depends only on the file itself: does any project in the workspace list it as a dependency? Before, it depended on which file was doing the importing. A new test reproduces the false error and fails before the fix. The issue's own reproduction goes from 1 error to 0. The existing auto-import tests still pass (9/9). The editor test suite passes 289 of 291, and the 2 failures also fail on main on this machine.",
+  "headline": "Editor shows a type error that doesn't exist in workspace projects"
+ },
+ "https://github.com/helix-editor/helix/pull/16340": {
+  "bug": "Running `cat file.txt | hx +10` should open the piped text at line 10, but the editor opened it at line 1 (issue #14666). The `+N` option was only applied to the first file named on the command line, so with no file named it was silently dropped.",
+  "fix": "When no file is named, the editor now remembers the `+N` line and moves the cursor there after it reads the piped text, the same way it does for a file. A bare `+` goes to the last line. A new test failed before the change and passes after it, and a manual run of the editor showed `+10`, `+150`, and `+` landing on lines 10, 150, and 200 of a 200-line input, where before all three opened at line 1.",
+  "headline": "`+N` line number now works when the file comes from stdin"
+ },
+ "https://github.com/helix-editor/helix/pull/16342": {
+  "bug": "In the command prompt, pressing `<tab>` repeatedly cycles through completions. When one of the suggestions was a path that needs quotes (it has a space, like `content/Introducing Python/`), the next suggestion was pasted into the wrong spot. Typing `:o content/<tab><tab>README.md` then failed with `unterminated token`, with a stray `'` left in front and a `/` missing (issue #15905, the quote and error part only).",
+  "fix": "The prompt now remembers the line as it was when the suggestions were worked out, and puts each new suggestion into that original line instead of into the line the previous suggestion left behind. A new test failed before the change and passes after it. A manual run of the editor with the folder layout from the issue showed the error before the fix and the file opening after it.",
+  "headline": "Tab-cycling file completions no longer breaks after a quoted path"
+ },
+ "https://github.com/helix-editor/helix/pull/16343": {
+  "bug": "Helix's bash tab-completion script used `mapfile`, a command that only exists in bash 4 and later. macOS still ships bash 3.2, so every `hx <tab>` there printed \"mapfile: command not found\" and completed nothing (issue #14938).",
+  "fix": "The script now reads the list of matches line by line with a plain loop that works in every bash version. Filenames with spaces still complete as one word. A test script showed all 5 sample completions failing on bash 3.2 before the change and working after it, with the same output as before on bash 5.3. The shell linter is clean.",
+  "headline": "Tab completion works again with the bash that ships on macOS"
+ },
+ "https://github.com/helix-editor/helix/pull/16346": {
+  "bug": "Pressing `gf` (go to file) on text like `file_name.ext;` or `name.ext,` tried to open a file whose name ended in the comma or semicolon, not the real file (issue #12889). The path matcher allows those characters inside a path so web links keep their query strings, and that let a match run on through punctuation that ends a sentence.",
+  "fix": "Each path match now drops trailing `,`, `;`, `!`, `?`, and `.` before it is opened, as a maintainer suggested in the issue. A lone `.` or `..` still counts as a folder, and links and punctuation inside a path work as before. New tests failed before the change and pass after it, and the full test suites, formatter, and linter pass.",
+  "headline": "Opening a file path followed by a comma or semicolon opens the right file"
+ },
+ "https://github.com/mastra-ai/mastra/pull/25295": {
+  "headline": "fix(core): unwrap DurableAgent stream results on sendSignal wakes"
+ },
+ "https://github.com/mastra-ai/mastra/pull/25373": {
+  "headline": "fix(factory): move the authoring Work item to Review when its PR opens"
+ },
+ "https://github.com/mastra-ai/mastra/pull/25689": {
+  "headline": "fix(core): reject JavaScript SKILL.md frontmatter when publishing a skill"
+ },
+ "https://github.com/mermaid-js/mermaid/pull/8362": {
+  "bug": "In a class diagram, a generic type with more than two type arguments was not converted. `list~T1, T2, T3~` showed up with the raw tildes instead of as `list<T1, T2, T3>` (issue #6520). The same code also dropped text when a method took two generic parameters, such as `fn(Map~K, V~ m, Map~A, B~ n)`, where the first parameter disappeared from the label.",
+  "fix": "The code that rejoins generics split apart by commas now looks past the middle arguments to find the closing tilde. It no longer reuses a part that already closed one generic, so it cannot throw text away. Nested generics render the same as before. New tests failed before the change and pass after it, and the full unit suite passes.",
+  "headline": "Class diagram generics with three or more types keep their tildes"
+ },
+ "https://github.com/mermaid-js/mermaid/pull/8364": {
+  "bug": "In an ER diagram, a relationship label written without quotes failed to parse when the word was one mermaid uses elsewhere (issue #6625). `AirSafetyReport ||--o{ Airport : to` stopped with a syntax error. The same happened for `one`, `many`, `end`, `class`, `subgraph`, `style`, `classDef`, `erDiagram`, and plain numbers such as `1` or `2.5`. Diagrams generated from field names hit this often.",
+  "fix": "After the `:` that starts a relationship label, the parser now reads the next word as plain label text, whatever it is. It goes back to normal right after the label, so the rest of the line works as before. New tests failed before the change and pass after it, and the full unit suite passes (6708 tests).",
+  "headline": "ER diagram relationship labels that match a keyword now parse"
+ },
+ "https://github.com/mermaid-js/mermaid/pull/8365": {
+  "bug": "In a state diagram, a state called `State` (any casing) broke the diagram when it sat at the end of a line, as in `[*] --> State` (issue #3152). Mermaid read the word as the start of a `state` declaration and swallowed the next line into it.",
+  "fix": "The word `state` now starts a declaration only when a name follows it on the same line. Otherwise it is an ordinary state name. New tests failed before the change and pass after it.",
+  "headline": "A state named State now parses at the end of a transition line"
+ },
+ "https://github.com/mermaid-js/mermaid/pull/8371": {
+  "bug": "In the dark theme, a tree view diagram drew its labels and connector lines in black on a dark grey background, so the tree was close to unreadable (issue #8369). GitLab and the live editor both use the dark theme in dark mode, so people saw this there.",
+  "fix": "The four dark themes, and the base theme when its dark mode setting is on, now give tree view diagrams the theme's own text color for labels and its line color for connectors. Any colors a user sets themselves still win. Light themes look the same as before. New tests failed before the change and pass after it, the full unit suite passes, and the docs note the new dark theme defaults.",
+  "headline": "Tree view diagrams are readable in dark themes"
+ },
+ "https://github.com/mermaid-js/mermaid/pull/8376": {
+  "bug": "In a class diagram, a note written as `note for Duck \"can fly\\ncan swim\"` showed the characters `\\n` instead of starting a new line (issue #6126). This worked in mermaid 10 and broke in mermaid 11, and the docs example had to switch to `<br>` to look right.",
+  "fix": "When mermaid hands a note to the renderer, it now turns each `\\n` into a line break, the same way other diagram labels already do. The note text you wrote is stored unchanged, and bold or other markdown in notes still works. A new test failed before the change and passes after it, and the full unit suite passes (6697 tests). One edge changes: a note with `\\\\n` (an escaped backslash before `n`) now breaks the line too, as other labels already do.",
+  "headline": "Line breaks in class diagram notes work again"
+ },
+ "https://github.com/openclaw/openclaw/pull/160499": {
+  "bug": "Remote MCP servers that use custom format names, like Google Maps' `google-duration`, printed \"unknown format\" warnings every time their tool list loaded. Each warning showed up twice. Logs filled with noise from healthy servers.",
+  "fix": "These notices now go to the debug log instead. Known formats such as email are still checked.",
+  "headline": "Noisy warnings from MCP tool servers"
+ },
+ "https://github.com/openclaw/openclaw/pull/160520": {
+  "bug": "A scheduled (cron) job could send a shortened reply ending in \"...(truncated)...\". This happened when it fell back to a long reply read from chat history.",
+  "fix": "When history marks a reply as shortened, the job now fetches the full message. If that fails, it returns nothing and the job uses its usual fallback.",
+  "headline": "Scheduled job sends a cut-off reply"
+ },
+ "https://github.com/openclaw/openclaw/pull/160582": {
+  "bug": "In Matrix and Slack, a draft preview could show a single letter \"N\" when the agent chose to stay silent. Nothing replaced it afterward.",
+  "fix": "Previews now hold back a lone \"N\" until the rest of the text arrives. Real replies that start with \"N\" still show and get delivered.",
+  "headline": "Stray \"N\" in chat previews"
+ },
+ "https://github.com/openclaw/openclaw/pull/160703": {
+  "bug": "`openclaw doctor --fix` stopped with an error and skipped plugin repair, for example for Codex. This happened when an old chat transcript had a file name that did not match its header. The docs say this case is only a warning.",
+  "fix": "Plugin repair now treats that case as a warning, as the docs say. The old transcript is still kept in a protected archive with its contents unchanged.",
+  "headline": "Doctor repair stops on an old transcript"
+ },
+ "https://github.com/openclaw/openclaw/pull/160944": {
+  "bug": "When agents talked to each other with `sessions_send`, each reply step changed the system prompt with a turn counter and message texts. That broke the provider's prompt cache. Each step paid again for the full prompt.",
+  "fix": "The changing parts now go into the current message instead of the system prompt. The system prompt stays the same across turns, so the cache can be reused. This covers two of the three parts of the issue.",
+  "headline": "Agent-to-agent chats miss the prompt cache"
+ },
+ "https://github.com/openclaw/openclaw/pull/161118": {
+  "bug": "When Anthropic rejected a request because a \"thinking\" setting was wrong, OpenClaw mistook it for a different kind of error. It sent the same request again, which failed again. The log also showed a misleading message about thinking blocks.",
+  "fix": "The error check now matches whole words only. A wrong-setting error now shows up after one request. Real thinking-block errors still get their one retry.",
+  "headline": "A request error wastes a retry with Anthropic"
+ },
+ "https://github.com/openclaw/openclaw/pull/161225": {
+  "bug": "Running `openclaw plugins reload voice-call` failed with an error about missing owner information. This happened when a source build kept its built-in copy of a plugin that was also installed from the registry. Users had to restart the whole Gateway to apply the plugin's settings.",
+  "fix": "Reload now accepts the built-in copy and ignores the leftover registry record for the same plugin. The other safety checks still reject unclear or conflicting owners.",
+  "headline": "Plugin reload fails for a built-in plugin"
+ },
+ "https://github.com/openclaw/openclaw/pull/162478": {
+  "bug": "If a config set the default model as plain text, running `openclaw config set agents.defaults.model.fallbacks ...` saved only the fallback list. The main model the user had chosen was lost.",
+  "fix": "When the command writes a part of a model setting that was plain text, it now keeps that text as the main model. The same goes for image model settings.",
+  "headline": "Setting fallbacks drops the main model"
+ },
+ "https://github.com/openclaw/openclaw/pull/162523": {
+  "bug": "With Telegram rich messages turned on, an agent reply that mentions a user through a `tg://user?id=` link reached Telegram as an ordinary link. The person mentioned got no notification. The older, non-rich way of sending handled this correctly.",
+  "fix": "When a link points at exactly `tg://user?id=<number>`, the rich message builders now send it as a real Telegram mention of that user. Every other link stays a link.",
+  "headline": "Telegram mentions by ID arrive as plain links"
+ },
+ "https://github.com/openclaw/openclaw/pull/162684": {
+  "bug": "When you send a message while the assistant is still busy with an earlier one, your message waits in a queue. The docs say the chat should show \"typing...\" during that wait. On Telegram and similar channels the indicator flashed for a fraction of a second and then went away, so the chat looked idle until the reply arrived. Fixes issue #162547.",
+  "fix": "The queued message now keeps the typing indicator on for the whole wait. It turns off when that message gets its reply, is cancelled, or is dropped from the queue. Messages that do not wait in a queue behave as before.",
+  "headline": "Queued messages show no typing indicator"
+ },
+ "https://github.com/openclaw/openclaw/pull/162758": {
+  "bug": "In the Control UI chat, when the assistant runs on Codex, its \"thinking\" steps (reasoning, and context compaction) showed up as tool cards with an empty input `{}` and a \"Completed\" label, even on turns where no tool ran. Fixes issue #162739.",
+  "fix": "The chat now leaves those thinking steps out of the tool cards. Real tool cards look and behave as before. A new test failed before the change and passes after it.",
+  "headline": "Codex reasoning shows up as an empty tool card"
+ },
+ "https://github.com/openclaw/openclaw/pull/163551": {
+  "bug": "When an agent asked the agent-to-agent (A2A) channel to do something it does not support, such as reading a message, the error said the channel's plugin was not loaded. The plugin was loaded and sending worked fine, so the error sent people chasing a problem that did not exist. Fixes issue #163518.",
+  "fix": "The error now says the channel does not support that action (\"Message action read not supported for channel a2a.\"). It is the same wording OpenClaw already uses for channels that list the actions they support. Nothing else changes. A new test failed before the change and passes after it.",
+  "headline": "Wrong error when a chat channel lacks an action"
+ },
+ "https://github.com/openclaw/openclaw/pull/163704": {
+  "bug": "When a scheduled (cron) job ran past its time limit, OpenClaw cleaned it up by stopping whatever was running in that chat session. If the job had already finished and a person had started a new turn in the same session, the cleanup stopped the person's turn instead. The reply never arrived. Fixes issue #163568.",
+  "fix": "Each scheduled run now carries its own run id. Before the cleanup stops anything, it checks whether that run still owns the session. If a different run now holds it, the cleanup leaves it alone and logs \"kept the current run\". New tests failed before the change and pass after it.",
+  "headline": "A timed-out scheduled job stops a later chat turn"
+ },
+ "https://github.com/openclaw/openclaw/pull/163986": {
+  "bug": "Some settings, like the Gateway's port, need a restart to take effect. If work is running, the Gateway waits for it to finish before restarting. When a person changed such a setting and then put the config file back exactly as it was before that wait ended, the Gateway restarted anyway. Control UI and chat channel sessions dropped for nothing. Fixes issue #119360.",
+  "fix": "While a restart is waiting, the Gateway now remembers the config it is actually running. If the file goes back to exactly that config, the waiting restart is cancelled. Explicit restart requests, a second change that needs a restart, and plugin install changes still restart. One exception came out of review: if the reverted change touched login settings (for example switching from a token to a password), the restart still happens, because only a restart puts the original login back in force. New tests failed before each change and pass after it, and a real Gateway run showed the restart gone after the fix.",
+  "headline": "Undoing a config change still restarts the Gateway"
+ },
+ "https://github.com/openclaw/openclaw/pull/164048": {
+  "bug": "The Gateway checks disk space in each active worker environment every minute. When the device that hosts a worker was offline, or had stopped offering workers, the Gateway still tried to reach it on every check. Each try failed, logged a warning, and held up the check until it timed out. Fixes issue #163958.",
+  "fix": "Before it checks a worker environment, the Gateway now looks at whether that device is available. If it is offline, the check is skipped and tried again next minute. The worker environment and its last disk reading are kept, so nothing is lost. Once the device comes back, the next check takes a fresh reading. A new test failed before the fix and passes after it.",
+  "headline": "Gateway keeps probing a node that is offline"
+ },
+ "https://github.com/openclaw/openclaw/pull/164136": {
+  "bug": "When Slack's login check failed while the Slack connection was starting, the bot stayed in a \"blocked\" state. In that state it cannot tell when someone mentions it, so channels that need a mention went quiet. It only tried the check again after a reconnect or an incoming message. On a quiet connection, neither might happen for a long time. Fixes issue #119861.",
+  "fix": "After a failed check, the bot now tries again on a timer, starting at 2 seconds and backing off to 30 seconds, until it succeeds. It stops trying on a hard login error, when the connection drops, or when the account stops. The review bot found one gap. A check that was already running when the connection dropped could still mark the bot as connected, or start another retry. A second change closes that gap. Tests failed before each change and pass after it.",
+  "headline": "Slack bot stays half-working after a startup login check fails"
+ },
+ "https://github.com/openclaw/openclaw/pull/164206": {
+  "bug": "When a Gmail hook failed before the agent run started (for example, the model provider rejected the request), Gmail's push service kept redelivering the same message. Each redelivery posted another identical \"Hook Gmail (error)\" alert into the chat, so one stuck email could fill a channel with copies of the same error. Fixes issue #164148.",
+  "fix": "The hook now remembers which email already announced a failure and skips the repeat alert for that email for 5 minutes. The email still retries on every redelivery, so no mail is dropped, and the logs still record each attempt. Once a later attempt for that email gets past the start, the memory clears, so a new failure is announced again. A new test failed before the fix and passes after it.",
+  "headline": "Gmail hook repeats the same error alert on every redelivery"
+ },
+ "https://github.com/openclaw/openclaw/pull/164272": {
+  "bug": "On a normal npm install, the acpx add-on that runs outside agents (Codex, Cursor, and others) is its own package. Two helper servers it starts to hand those agents their tools could not find OpenClaw's files and quit right away. So those agents got no plugin tools and no OpenClaw tools, including memory search. Fixes issue #164211.",
+  "fix": "When acpx sits outside the OpenClaw folder, it now finds OpenClaw by following the program that launched it, and starts the helper servers from there. Source checkouts and the bundled layout work as before.",
+  "headline": "ACP agents lose their tools when acpx is a separate package"
+ },
+ "https://github.com/openclaw/openclaw/pull/164305": {
+  "bug": "When the Slack add-on and the rest of OpenClaw load two different copies of the same web-socket library, Slack's own connection code warns about every keep-alive \"ping\" or \"pong\" that belongs to some other connection. One report measured this warning at 19% of all Gateway log lines. Fixes issue #164266.",
+  "fix": "OpenClaw already hides two harmless Slack warnings in its Slack logger. It now hides these two exact warnings too. Every other Slack warning and error still gets logged, and the connection itself works as before.",
+  "headline": "Slack floods the Gateway log with ping warnings"
+ },
+ "https://github.com/openclaw/openclaw/pull/164336": {
+  "bug": "When the memory add-on catches up on sessions at startup, it asks the database about every session at once. With more sessions than SQLite allows in one question (32,766 by default), the query fails with \"too many SQL variables\" and session sync stops. Fixes issue #164283.",
+  "fix": "The lists of sessions and memory entries are now handed to the database as one value, using a helper OpenClaw already has, instead of one value per item. So the query no longer hits the limit, however many sessions there are. A test with one more session than the limit failed before the fix and passes after it. A check through the real startup path with 32,767 real sessions failed on the old code and returned all 32,766 live sessions (the one deleted session left out) with the fix.",
+  "headline": "Memory search breaks on large session sets (\"too many SQL variables\")"
+ },
+ "https://github.com/openclaw/openclaw/pull/164363": {
+  "bug": "Before upgrading its databases, `openclaw doctor --fix` makes a backup copy and checks that the file did not change while it was being moved into place. Part of that check is the file's \"created at\" time. On Linux systems where Node can't read a real creation time (older kernels without the `statx` call), Node reports the last-change time instead, and that time changes when the file is linked into place. So the check wrongly decides the backup was tampered with, and the upgrade stops. Fixes issue #164319.",
+  "fix": "The check no longer compares the \"created at\" time. It still compares the file's identity, size, and contents. A test that simulates the Linux behavior failed before the fix and passes after it.",
+  "headline": "Doctor can't back up the database on some Linux systems"
+ },
+ "https://github.com/openclaw/openclaw/pull/164439": {
+  "bug": "Discord Activities show agent-made widgets inside Discord. The Activity page loads a helper script (Discord's SDK) from the Gateway. When the Discord plugin is installed from npm or ClawHub, that script sits in a different folder than the code expects, so the Gateway answers \"not found\" and the Activity spins forever. Part of issue #127421. The other part of that issue, a Discord command that gets deleted, is left for the maintainers, so the issue stays open.",
+  "fix": "The plugin now looks for the script in both places it can live and uses the one that exists. A test for each install layout fetches the script through the real route. The npm-layout test failed before the fix and passes after it. Against the real published package, the route went from \"not found\" to serving the full script.",
+  "headline": "Discord Activity hangs on plugin installs from npm"
+ },
+ "https://github.com/openclaw/openclaw/pull/164531": {
+  "bug": "In OpenClaw's voice chat (Talk), OpenAI sends each spoken line with an id for the message and for the reply it belongs to. The Gateway threw those ids away before passing the transcript on. Apps listening to the chat could not tell which text belonged to which message. Part of issue #164456.",
+  "fix": "The ids now travel with each transcript line. User lines carry the message id, and assistant lines also carry the reply id. Two new tests failed before the fix and pass after it.",
+  "headline": "Voice chat transcripts lose their message ids"
+ },
+ "https://github.com/openclaw/openclaw/pull/164649": {
+  "bug": "When OpenClaw streams a reply into Telegram, it sometimes moves the reply into a fresh message (for example, below a tool-progress line) and deletes the old one. It deleted the old message on a timer, whether or not the new message had actually arrived. If the new message was slow or Telegram refused it, the chat was left with nothing visible. Issues #164610 and #164611.",
+  "fix": "The old message now stays on screen until Telegram accepts the new one, or until the turn ends and OpenClaw cleans up. Tests that failed before the fix pass after it.",
+  "headline": "Telegram replies vanish when a replacement message is slow"
+ },
+ "https://github.com/openclaw/openclaw/pull/164700": {
+  "bug": "`openclaw update` stopped with \"Package publication object has an unsafe identity\" when an install folder such as `bin` belonged to another user (common when Node was installed as root). The message named no folder and no owner, so users could not tell what to fix (issue #164672).",
+  "fix": "The refusal now names the folder, what kind of object it is, who owns it, and who should own it, for example `object=bin, kind=directory, uid=1001; required directory owned by uid 0`. The safety check itself is unchanged, and the previous install keeps working.",
+  "headline": "Update refusal did not say which folder had the wrong owner"
+ },
+ "https://github.com/openclaw/openclaw/pull/164752": {
+  "bug": "When a managed update is refused early (for example because a recovery is still pending) and the updater publishes no restart notice, Settings \u2192 Updates and `openclaw update status` only say \"managed-service-handoff-failed\". The real reason is lost, so users can't tell what blocked the update (issue #164693).",
+  "fix": "The update record now keeps the updater's own refusal reason (such as `update-recovery-pending` or `candidate-validation-failed`) instead of overwriting it with the generic one. Recovery and restart behavior are unchanged.",
+  "headline": "A refused update shows a generic reason"
+ },
+ "https://github.com/plotly/plotly.py/pull/5779": {
+  "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
+  "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
+  "headline": "Adding annotations or shapes gets very slow on a busy figure"
+ },
+ "https://github.com/plotly/plotly.py/pull/5780": {
+  "bug": "With `trendline_scope=\"overall\"` and side plots (`marginal_x` or `marginal_y`), plotly express drew the overall trendline on the side box or histogram plots too, not just on the main scatter plot (issue #4669).",
+  "fix": "The overall trendline is now added only to the main plot cells. Side plots get none. Faceted figures still get one trendline per facet.",
+  "headline": "Overall trendline also drawn on the side plots"
+ },
+ "https://github.com/plotly/plotly.py/pull/5787": {
+  "bug": "When a user starts Kaleido's background server (`kaleido.start_sync_server()`), every `write_image`, `to_image` and `write_images` call printed \"The kopts argument is ignored if using a server\", even though the user set no options. plotly always sends one default header, and Kaleido warns about any options at all (issue #5786).",
+  "fix": "plotly now hides that one warning only when the options hold nothing but its own default header. If the user set real options that the server will drop, the warning still shows.",
+  "headline": "Needless warning on every image export when a Kaleido server is running"
+ },
+ "https://github.com/plotly/plotly.py/pull/5788": {
+  "bug": "`px.imshow(img, aspect=\"auto\")` is meant to stretch an image to fill the plot. For color (RGB or RGBA) images it did nothing: the picture kept square pixels and left empty space beside it (issue #5172). The chart library locks an image's height to its width by default, and plotly only touched that lock for `aspect=\"equal\"`.",
+  "fix": "For color images with `aspect=\"auto\"`, plotly now turns that lock off on every y axis, including each facet's. Grayscale images and `aspect=\"equal\"` are unchanged. Color images from xarray with no `aspect` set now also stretch, matching their documented default.",
+  "headline": "Images ignore aspect=\"auto\" in px.imshow"
+ },
+ "https://github.com/psf/black/pull/5448": {
+  "bug": "Code like `b = [1,][2](3)` has a trailing comma inside the first brackets. Black splits those brackets onto several lines, which is right. It also splits the second `[2]` brackets for no reason, so the output is longer and uglier than it needs to be (issue #3268).",
+  "fix": "When Black picks where to split such a line, it now skips a choice that would split the later brackets while the first ones still have to split anyway. The new output keeps `[2](3)` on one line. The change is behind the `--preview` flag, so normal users see no change until the project turns it on.",
+  "headline": "Extra split when a trailing comma is followed by more brackets"
+ },
+ "https://github.com/psf/black/pull/5449": {
+  "bug": "With the experimental long-string handling turned on, Black can print an end-of-line comment twice, like `a = b.c(d, \"e\") # comment # comment` (issue #3665). It happens when Black removes brackets around a string, or joins a string that was split with a backslash.",
+  "fix": "Two places in the string handling copied the line's comments and then added them again. The fix stops the extra copy, so each comment appears once.",
+  "headline": "Comments printed twice when long-string handling rewrites a line"
+ },
+ "https://github.com/transact-rs/sqlx/pull/4429": {
+  "bug": "a SQLite query using `$0` as a bind parameter panicked instead of returning an error, because SQLite parameter numbers start at 1.",
+  "fix": "`sqlx-sqlite/src/arguments.rs` now returns a protocol error for `$0`. A new test, `it_rejects_dollar_zero_parameter` in `tests/sqlite/sqlite.rs`, checks the error and confirms the connection still works afterward.",
+  "headline": "fix(sqlite): return an error for `$0` bind parameter instead of panicking"
+ },
+ "https://github.com/transact-rs/sqlx/pull/4438": {
+  "bug": "on some errors, such as a full database, SQLite cancels the whole transaction by itself. When the program then dropped its transaction, sqlx tried to cancel it again, that failed, and sqlx kept believing a transaction was still open. The next attempt to start a transaction was refused (issue #4434).",
+  "fix": "before cancelling, sqlx now asks SQLite whether a transaction is still open. If not, it skips the cancel and still records that the transaction is over. A new test, `it_can_begin_after_sqlite_rolls_back_a_full_transaction`, reproduces the issue and fails without the fix.",
+  "headline": "fix(sqlite): keep transaction depth in sync after SQLite rolls back on its own"
+ },
+ "https://github.com/vega/altair/pull/4163": {
+  "bug": "When a chart that was already built from other charts had its own filter (a \"transform\"), adding another chart to it with `|`, `&` or `+` placed the new chart inside the same group. The filter then applied to the new chart as well, so it showed the wrong data or came out empty, with no error (issue #3141).",
+  "fix": "When the left-hand chart carries a filter, these operators now wrap it as its own group and put the new chart beside it, the same as `alt.hconcat`, `alt.vconcat`, `alt.concat` and `alt.layer` already do. Charts without a filter combine exactly as before. New tests failed before the change and pass after it, the full test suite passes, and all 308 gallery examples produce identical output.",
+  "headline": "Combining charts with |, & and + no longer leaks a chart's filter onto the others"
+ },
+ "https://github.com/vuejs/core/pull/15756": {
+  "bug": "Vue runs some watchers \"before render\" (pre watchers) in a fixed order. If code inside one of those watchers mounted a new app, Vue flushed every waiting pre watcher at that moment, including ones that belonged to other parts of the page and should have run later. Work then ran out of order (issue #6728).",
+  "fix": "When an app is mounted inside a running watcher, Vue now flushes only the watchers that belong to the components that mount just created, and leaves every other waiting watcher where it was. A test that failed before the change now passes, and the full test suite passes.",
+  "headline": "Mounting an app inside a watcher no longer runs other watchers too early"
+ }
+}

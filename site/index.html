@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Source Work</title>
+<meta name="description" content="Pull requests I've contributed to open-source projects: the bug, the fix, and where it stands.">
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --ink: #1b1a17; --muted: #6b6860; --line: #e7e4de;
+  --accent: #2f5bd3; --merged: #7a3fd1; --merged-bg: #f1eafc; --open: #1a7f37; --open-bg: #e6f4ea;
+  --closed: #8a8780; --closed-bg: #efeeeb; --add: #1a7f37; --del: #c0392b; --code-bg: #f3f1ed;
+  --shadow: 0 1px 2px rgba(20,18,14,.04), 0 2px 8px rgba(20,18,14,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121211; --surface: #1b1b19; --ink: #ecebe7; --muted: #9b998f; --line: #2c2b28;
+    --accent: #7ea2ff; --merged: #b48cf2; --merged-bg: #2a2038; --open: #5fcf7e; --open-bg: #17301f;
+    --closed: #8f8d86; --closed-bg: #262523; --add: #5fcf7e; --del: #ff7b6b; --code-bg: #24231f;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121211; --surface: #1b1b19; --ink: #ecebe7; --muted: #9b998f; --line: #2c2b28;
+  --accent: #7ea2ff; --merged: #b48cf2; --merged-bg: #2a2038; --open: #5fcf7e; --open-bg: #17301f;
+  --closed: #8f8d86; --closed-bg: #262523; --add: #5fcf7e; --del: #ff7b6b; --code-bg: #24231f;
+  --shadow: none;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.55 ui-sans-serif, -apple-system, "Segoe UI", Inter, Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: .86em; }
+code { background: var(--code-bg); padding: .1em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+header { padding: 56px 0 28px; }
+.eyebrow { color: var(--muted); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
+h1 { font-size: clamp(28px, 5vw, 40px); line-height: 1.15; margin: 8px 0 10px; letter-spacing: -.02em; }
+.lede { color: var(--muted); max-width: 640px; margin: 0; }
+.meta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 16px; font-size: 13px; color: var(--muted); }
+.live { display: inline-flex; align-items: center; gap: 6px; }
+.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--open); }
+.live.stale::before { background: var(--closed); }
+
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; background: var(--line);
+  border: 1px solid var(--line); border-radius: 12px; overflow: hidden; margin: 8px 0 40px; }
+.stat { background: var(--surface); padding: 16px 18px; }
+.stat b { display: block; font-size: 26px; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.stat span { color: var(--muted); font-size: 13px; }
+@media (max-width: 720px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat:last-child { grid-column: span 2; } }
+
+h2 { font-size: 18px; margin: 0 0 14px; letter-spacing: -.01em; }
+.repos { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; margin-bottom: 44px; }
+.repo { all: unset; cursor: pointer; display: flex; flex-direction: column; gap: 6px; background: var(--surface);
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; box-shadow: var(--shadow); transition: border-color .15s; }
+.repo:hover, .repo:focus-visible { border-color: var(--accent); }
+.repo[aria-pressed="true"] { border-color: var(--accent); outline: 2px solid color-mix(in srgb, var(--accent) 25%, transparent); }
+.repo-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.repo-top img { width: 20px; height: 20px; border-radius: 5px; flex: none; }
+.repo-name { font-weight: 600; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.repo-sub { display: flex; gap: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; }
+.repo-counts { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; }
+.chip { all: unset; cursor: pointer; font-size: 13px; padding: 5px 11px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--muted); }
+.chip[aria-pressed="true"] { color: var(--ink); border-color: var(--ink); }
+.chip:focus-visible { outline: 2px solid var(--accent); }
+.search { flex: 1; min-width: 180px; font: inherit; font-size: 14px; padding: 6px 12px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.search:focus { outline: 2px solid var(--accent); border-color: transparent; }
+.count { font-size: 13px; color: var(--muted); margin-left: auto; }
+
+.prs { display: flex; flex-direction: column; gap: 12px; margin-bottom: 64px; }
+.pr { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; box-shadow: var(--shadow); }
+.pr-head { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.pill { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
+.pill.merged { color: var(--merged); background: var(--merged-bg); }
+.pill.open, .pill.draft { color: var(--open); background: var(--open-bg); }
+.pill.closed { color: var(--closed); background: var(--closed-bg); }
+.pill.new { color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.pr h3 { font-size: 17px; margin: 8px 0 2px; line-height: 1.35; letter-spacing: -.01em; }
+.pr-title { font-size: 13px; color: var(--muted); margin: 0 0 12px; overflow-wrap: anywhere; }
+.bf { display: grid; grid-template-columns: 52px 1fr; gap: 6px 12px; font-size: 14.5px; }
+.bf dt { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; padding-top: 2px; }
+.bf dd { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .bf { grid-template-columns: 1fr; } .bf dd { margin-bottom: 6px; } }
+.pr-foot { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.add { color: var(--add); } .del { color: var(--del); }
+.issues { display: flex; gap: 6px; flex-wrap: wrap; }
+.issue { font-size: 12.5px; border: 1px solid var(--line); border-radius: 6px; padding: 1px 7px; color: var(--ink); max-width: 100%;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+details { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
+summary { cursor: pointer; font-size: 13px; color: var(--accent); width: fit-content; }
+.md { font-size: 14px; overflow-wrap: anywhere; }
+.md h4 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 14px 0 4px; }
+.md p { margin: 6px 0; } .md ul { margin: 6px 0; padding-left: 20px; }
+.md pre { background: var(--code-bg); padding: 10px 12px; border-radius: 8px; overflow-x: auto; font-size: 12.5px; }
+.md pre code { background: none; padding: 0; }
+.empty { color: var(--muted); padding: 40px 0; text-align: center; }
+footer { border-top: 1px solid var(--line); padding: 20px 0 40px; font-size: 13px; color: var(--muted); }
+.theme { all: unset; cursor: pointer; color: var(--muted); }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="eyebrow">Open source</div>
+  <h1 id="heading">Contributions</h1>
+  <p class="lede">Bug fixes I've sent to widely used open-source projects. Each one starts from a reported issue, reproduces it with a failing test, and fixes it. This page updates itself as pull requests are opened, reviewed, and merged.</p>
+  <div class="meta">
+    <span class="live stale" id="freshness">Loading…</span>
+    <a id="profile" href="#">GitHub profile</a>
+    <button class="theme" id="theme" type="button">Toggle theme</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="stats" id="stats" aria-label="Summary"></section>
+
+  <h2>Projects</h2>
+  <section class="repos" id="repos"></section>
+
+  <h2>Pull requests</h2>
+  <div class="toolbar" role="group" aria-label="Filters">
+    <button class="chip" data-status="merged" aria-pressed="true">Merged</button>
+    <button class="chip" data-status="open" aria-pressed="true">In review</button>
+    <button class="chip" data-status="closed" aria-pressed="false">Closed</button>
+    <input class="search" id="q" type="search" placeholder="Search bugs, fixes, repos…" aria-label="Search pull requests">
+    <span class="count" id="count"></span>
+  </div>
+  <section class="prs" id="prs"></section>
+</main>
+
+<footer class="wrap">
+  Data from the GitHub API, rebuilt hourly; statuses are re-checked live when the page loads.
+  Fixes were developed with an AI coding agent under my direction, as disclosed on each pull request.
+</footer>
+
+<script>
+const state = { data: null, statuses: new Set(["merged", "open"]), repo: null, q: "" };
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const nf = new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 });
+const df = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", year: "numeric" });
+const bucket = (s) => (s === "draft" ? "open" : s);
+
+function ago(iso) {
+  const m = Math.round((Date.now() - new Date(iso)) / 60000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m} min ago`;
+  const h = Math.round(m / 60);
+  return h < 48 ? `${h} h ago` : `${Math.round(h / 24)} days ago`;
+}
+
+// Inline markdown: code, bold, links. Input is escaped first.
+function inline(s) {
+  return esc(s)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" rel="noopener">$1</a>');
+}
+
+function block(md) {
+  const out = [];
+  let list = null, code = null;
+  const flush = () => { if (list) { out.push(`<ul>${list.join("")}</ul>`); list = null; } };
+  for (const line of md.split("\n")) {
+    if (line.trim().startsWith("```")) {
+      if (code) { out.push(`<pre><code>${esc(code.join("\n"))}</code></pre>`); code = null; }
+      else { flush(); code = []; }
+      continue;
+    }
+    if (code) { code.push(line); continue; }
+    const li = line.match(/^\s*[-*]\s+(.*)/);
+    if (li) { (list ||= []).push(`<li>${inline(li[1])}</li>`); continue; }
+    flush();
+    if (line.trim() && !/^\s*<!--/.test(line)) out.push(`<p>${inline(line.replace(/^#+\s*/, ""))}</p>`);
+  }
+  flush();
+  if (code) out.push(`<pre><code>${esc(code.join("\n"))}</code></pre>`);
+  return out.join("");
+}
+
+function render() {
+  const { data } = state;
+  const prs = data.prs;
+  const merged = prs.filter((p) => p.status === "merged");
+  const mergedRepos = new Set(merged.map((p) => p.repo));
+  const repoBy = Object.fromEntries(data.repos.map((r) => [r.name, r]));
+  const stars = [...mergedRepos].reduce((n, r) => n + (repoBy[r]?.stars || 0), 0);
+  const lines = merged.reduce((n, p) => n + p.additions + p.deletions, 0);
+  const issues = new Set(merged.flatMap((p) => p.issues.map((i) => i.url))).size;
+  $("#stats").innerHTML = [
+    [merged.length, "merged pull requests"],
+    [prs.filter((p) => bucket(p.status) === "open").length, "in review now"],
+    [mergedRepos.size, "projects with merged work"],
+    [nf.format(stars), "combined stars of those projects"],
+    [issues, "reported issues closed"],
+  ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+
+  const repoStats = (name) => {
+    const mine = prs.filter((p) => p.repo === name);
+    return { merged: mine.filter((p) => p.status === "merged").length, open: mine.filter((p) => bucket(p.status) === "open").length };
+  };
+  const repos = [...data.repos].sort((a, b) => repoStats(b.name).merged - repoStats(a.name).merged || b.stars - a.stars);
+  $("#repos").innerHTML = repos.map((r) => {
+    const c = repoStats(r.name);
+    return `<button class="repo" data-repo="${esc(r.name)}" aria-pressed="${state.repo === r.name}" title="${esc(r.description)}">
+      <span class="repo-top"><img src="${esc(r.avatar)}&s=40" alt="" loading="lazy"><span class="repo-name">${esc(r.name)}</span></span>
+      <span class="repo-sub">${r.language ? `<span><span class="dot" style="background:${esc(r.languageColor)}"></span>${esc(r.language)}</span>` : ""}<span>★ ${nf.format(r.stars)}</span></span>
+      <span class="repo-counts">${c.merged ? `<span class="pill merged">${c.merged} merged</span>` : ""}${c.open ? `<span class="pill open">${c.open} in review</span>` : ""}</span>
+    </button>`;
+  }).join("");
+
+  const q = state.q.toLowerCase();
+  const order = { merged: 0, open: 1, draft: 1, closed: 2 };
+  const shown = prs
+    .filter((p) => state.statuses.has(bucket(p.status)))
+    .filter((p) => !state.repo || p.repo === state.repo)
+    .filter((p) => !q || [p.title, p.headline, p.bug, p.fix, p.repo].join(" ").toLowerCase().includes(q))
+    .sort((a, b) => order[a.status] - order[b.status] || new Date(b.mergedAt || b.createdAt) - new Date(a.mergedAt || a.createdAt));
+  $("#count").textContent = `${shown.length} of ${prs.length}`;
+  $("#prs").innerHTML = shown.length ? shown.map(card).join("") : `<p class="empty">No pull requests match.</p>`;
+}
+
+function card(p) {
+  const label = { merged: "Merged", open: "In review", draft: "Draft", closed: "Closed" }[p.status];
+  const when = p.status === "merged" ? `merged ${df.format(new Date(p.mergedAt))}`
+    : p.status === "closed" ? `closed ${df.format(new Date(p.closedAt))}` : `opened ${df.format(new Date(p.createdAt))}`;
+  const details = [["Why", p.why], ["What changed", p.changes], ["How it was verified", p.verification]]
+    .filter(([, v]) => v).map(([h, v]) => `<h4>${h}</h4>${block(v)}`).join("");
+  return `<article class="pr">
+    <div class="pr-head"><span class="pill ${p.status}">${label}</span>${p.fresh ? `<span class="pill new">updated live</span>` : ""}
+      <a href="https://github.com/${esc(p.repo)}">${esc(p.repo)}</a><span>${when}</span></div>
+    <h3>${inline(p.headline || p.title)}</h3>
+    <p class="pr-title mono"><a href="${esc(p.url)}">#${p.number}</a> ${p.headline ? esc(p.title) : ""}</p>
+    ${p.bug || p.fix ? `<dl class="bf">${p.bug ? `<dt>Bug</dt><dd>${inline(p.bug)}</dd>` : ""}${p.fix ? `<dt>Fix</dt><dd>${inline(p.fix)}</dd>` : ""}</dl>` : ""}
+    <div class="pr-foot">
+      ${p.additions != null ? `<span class="mono"><span class="add">+${p.additions}</span> <span class="del">−${p.deletions}</span> · ${p.changedFiles} file${p.changedFiles === 1 ? "" : "s"}</span>` : ""}
+      ${p.reviews ? `<span>${p.reviews} review${p.reviews === 1 ? "" : "s"}</span>` : ""}
+      ${p.issues?.length ? `<span class="issues">${p.issues.map((i) => `<a class="issue" href="${esc(i.url)}" title="${esc(i.title)}">Fixes #${i.number} ${esc(i.title)}</a>`).join("")}</span>` : ""}
+    </div>
+    ${details ? `<details><summary>Full explanation</summary><div class="md">${details}</div></details>` : ""}
+  </article>`;
+}
+
+// Between hourly rebuilds, ask GitHub directly for current states so a merge shows up on the next page load.
+async function liveRefresh() {
+  const { data } = state;
+  const q = encodeURIComponent(`author:${data.author} is:pr is:public -user:${data.author}`);
+  const res = await fetch(`https://api.github.com/search/issues?q=${q}&sort=updated&per_page=100`);
+  if (!res.ok) return false;
+  const byUrl = Object.fromEntries(data.prs.map((p) => [p.url, p]));
+  const repoNames = new Set(data.repos.map((r) => r.name));
+  for (const it of (await res.json()).items) {
+    const live = it.pull_request.merged_at ? "merged" : it.state === "closed" ? "closed" : it.draft ? "draft" : "open";
+    const known = byUrl[it.html_url];
+    if (known) {
+      if (known.status !== live) Object.assign(known, { status: live, mergedAt: it.pull_request.merged_at, closedAt: it.closed_at, fresh: true });
+      continue;
+    }
+    const repo = it.repository_url.replace("https://api.github.com/repos/", "");
+    if (!repoNames.has(repo)) continue; // new repo: wait for the hourly build to fetch its details
+    data.prs.push({ number: it.number, title: it.title, url: it.html_url, status: live, createdAt: it.created_at,
+      mergedAt: it.pull_request.merged_at, closedAt: it.closed_at, repo, issues: [], fresh: true });
+  }
+  return true;
+}
+
+async function main() {
+  try {
+    state.data = await (await fetch("data.json", { cache: "no-cache" })).json();
+  } catch {
+    $("#prs").innerHTML = `<p class="empty">Couldn't load data.json.</p>`;
+    return;
+  }
+  const { author, generatedAt } = state.data;
+  $("#profile").href = `https://github.com/${author}`;
+  $("#heading").textContent = `${author}'s open-source contributions`;
+  $("#freshness").textContent = `Rebuilt ${ago(generatedAt)}`;
+  render();
+  try {
+    if (await liveRefresh()) {
+      $("#freshness").classList.remove("stale");
+      $("#freshness").textContent = `Live · rebuilt ${ago(generatedAt)}`;
+      render();
+    }
+  } catch { /* rate-limited or offline: the hourly build still stands */ }
+}
+
+document.querySelector(".toolbar").addEventListener("click", (e) => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+  const s = chip.dataset.status;
+  state.statuses.has(s) ? state.statuses.delete(s) : state.statuses.add(s);
+  chip.setAttribute("aria-pressed", state.statuses.has(s));
+  render();
+});
+$("#repos").addEventListener("click", (e) => {
+  const r = e.target.closest(".repo");
+  if (!r) return;
+  state.repo = state.repo === r.dataset.repo ? null : r.dataset.repo;
+  render();
+});
+$("#q").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+$("#theme").addEventListener("click", () => {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch {}
+});
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+main();
+</script>
+</body>
+</html>
