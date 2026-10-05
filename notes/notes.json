@@ -138,6 +138,11 @@
   "fix": "When mermaid hands a note to the renderer, it now turns each `\\n` into a line break, the same way other diagram labels already do. The note text you wrote is stored unchanged, and bold or other markdown in notes still works. A new test failed before the change and passes after it, and the full unit suite passes (6697 tests). One edge changes: a note with `\\\\n` (an escaped backslash before `n`) now breaks the line too, as other labels already do.",
   "headline": "Line breaks in class diagram notes work again"
  },
+ "https://github.com/modelcontextprotocol/servers/pull/4881": {
+  "bug": "The git server's `git_show` tool failed when asked for a file at a given version, such as `HEAD:path/to/file`. Plain `git show` accepts that form, so AI assistants send it. The tool treated every input as a commit, so it returned an error the assistant could not act on.",
+  "fix": "The tool now works out what the input names first. A file returns its content, a folder returns a listing, and a commit is shown the same way as before. The tool's description now mentions the `<version>:<path>` form so assistants know it works. New tests failed before the change and pass after it.",
+  "headline": "The git tool can't show a file at a past version"
+ },
  "https://github.com/openclaw/openclaw/pull/160499": {
   "bug": "Remote MCP servers that use custom format names, like Google Maps' `google-duration`, printed \"unknown format\" warnings every time their tool list loaded. Each warning showed up twice. Logs filled with noise from healthy servers.",
   "fix": "These notices now go to the debug log instead. Known formats such as email are still checked.",
