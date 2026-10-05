@@ -300,7 +300,7 @@
  },
  "https://github.com/openclaw/openclaw/pull/165185": {
   "bug": "An Incognito session can own a separate working copy of the code (a worktree), for example when it starts a helper that works in its own folder. Deleting that session cleans the folder up. Resetting it does not: the session is gone, but its folder stays on disk and is still listed as in use. Part of issue #159304.",
-  "fix": "Reset now runs the same cleanup step that delete already runs, at the same point. Unsaved work in the folder is saved first. If the folder cannot be removed safely (something is still running in it, or it belongs to someone else), it is kept and a warning is logged. Normal sessions, and sessions with no folder, behave as before.",
+  "fix": "Reset now runs the same cleanup step that delete already runs, at the same point. Unsaved work in the folder is saved first. If the folder cannot be removed safely (something is still running in it, or it belongs to someone else), it is kept, and the reset reply says where it is and why it was kept, the same way delete does. Normal sessions, and sessions with no folder, behave as before.",
   "headline": "Resetting a private (Incognito) session leaves its work folder behind"
  },
  "https://github.com/plotly/plotly.py/pull/5779": {
