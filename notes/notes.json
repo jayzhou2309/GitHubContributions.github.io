@@ -323,6 +323,11 @@
   "fix": "When an earlier image cannot be reloaded, OpenClaw now adds a neutral note that the image is not included, instead of the resend instruction. An image that fails on the current turn still gets the resend instruction. Why the reload fails is left alone, because changing which folders may be read is a security choice.",
   "headline": "The agent takes back an earlier image answer when the image cannot be reloaded"
  },
+ "https://github.com/openclaw/openclaw/pull/166222": {
+  "bug": "When OpenClaw runs on Node installed with Homebrew, `brew upgrade node` removes the old Node folder. OpenClaw keeps running, but every new command it runs for the agent and every MCP server it starts fails with \"ENOENT\", because it still points at the deleted Node (issue #166170).",
+  "fix": "When the Node that OpenClaw started on is gone, new launches use Homebrew's stable Node path (`opt/node/bin/node`) instead. Nothing changes while the old Node still exists, and nothing changes for installs that don't use Homebrew.",
+  "headline": "Commands and MCP servers break after a Homebrew Node upgrade"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
