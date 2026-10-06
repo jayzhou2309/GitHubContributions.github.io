@@ -333,6 +333,11 @@
   "fix": "Doctor now checks a tool-free job's saved policy with the same rule the cron service uses to keep it. A policy that matches the job's owner is accepted. Trusted, malformed, or mismatched policies are still reported as invalid. A new test fails before the fix and passes after it.",
   "headline": "Doctor wrongly flags a saved account policy on a command cron job"
  },
+ "https://github.com/openclaw/openclaw/pull/166316": {
+  "bug": "Some users keep their list of agents in a separate file that the main config pulls in. For them, `openclaw agents delete` (and the same action from the Gateway) refuses to run with an \"include ownership\" error, so the agent can't be removed (issue #166295).",
+  "fix": "When the delete rebuilt the config, it left a few empty settings behind. The check that decides which file a change belongs to counted those empty settings as changes to the main file, so it refused the write. The check now treats a missing setting and an empty one as the same thing. Real additions and removals are still checked as before. A new test that writes real files fails before the fix and passes after it.",
+  "headline": "Deleting an agent fails when the agent list lives in an included file"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
