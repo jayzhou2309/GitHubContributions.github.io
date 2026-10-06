@@ -9,6 +9,11 @@
   "fix": "the keyword search now takes the 500 best matches, not the 500 oldest, before scoring them. A new test saves 600 filler notes and then the right one, and checks that the right one comes first. It fails without the fix and passes with it. The full test suite passes.",
   "headline": "fix(search): rank the unfiltered lexical window before capping it"
  },
+ "https://github.com/MemPalace/mempalace/pull/2686": {
+  "bug": "when a `mempalace serve` hub is running, `mempalace mine <dir>` without `--mode` is handed to the hub with no mode at all. The hub refuses it with `invalid mode 'None'` and the command fails, even though the docs say the mode defaults to `projects`. Save hooks and scripts that rely on that default break as soon as a hub starts (issue #2682).",
+  "fix": "the command now fills in `projects` before handing the job to the hub, the same way it already does when it runs the job itself. A new test fails without the fix and passes with it. The agent also checked against a real hub: before the fix the command failed, after it the files were mined. The full test suite passes.",
+  "headline": "fix(cli): default hub-forwarded mine to projects mode"
+ },
  "https://github.com/NousResearch/hermes-agent/pull/127061": {
   "bug": "After an update, Hermes checks its `state.db` database. If the check fails, it copies the pre-update snapshot back over it. On macOS, a database that another process held locked failed the check. The step that should spot that other process only worked on Linux, so Hermes copied the old snapshot over the healthy database and lost the newer rows (issue #127010, reported by Froraut).",
   "fix": "The guard now uses a holder scan that works on Linux, macOS and Windows. If something still holds the database, Hermes refuses to restore and names the process. If nothing holds it, the restore runs as before. The refusal message no longer says \"restored copy also failed\" when nothing was copied.",
