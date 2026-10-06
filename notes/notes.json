@@ -328,6 +328,11 @@
   "fix": "When the Node that OpenClaw started on is gone, new launches use Homebrew's stable Node path (`opt/node/bin/node`) instead. Nothing changes while the old Node still exists, and nothing changes for installs that don't use Homebrew.",
   "headline": "Commands and MCP servers break after a Homebrew Node upgrade"
  },
+ "https://github.com/openclaw/openclaw/pull/166260": {
+  "bug": "A cron job that only runs a command (no agent tools) can keep an account policy saved from earlier. The cron service accepts that policy and keeps it, but `openclaw doctor` reports the same job as invalid, so users are told to fix something that is not broken (issue #166242).",
+  "fix": "Doctor now checks a tool-free job's saved policy with the same rule the cron service uses to keep it. A policy that matches the job's owner is accepted. Trusted, malformed, or mismatched policies are still reported as invalid. A new test fails before the fix and passes after it.",
+  "headline": "Doctor wrongly flags a saved account policy on a command cron job"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
