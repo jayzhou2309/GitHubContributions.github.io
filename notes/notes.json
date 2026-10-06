@@ -408,6 +408,11 @@
   "fix": "When the left-hand chart carries a filter, these operators now wrap it as its own group and put the new chart beside it, the same as `alt.hconcat`, `alt.vconcat`, `alt.concat` and `alt.layer` already do. Charts without a filter combine exactly as before. New tests failed before the change and pass after it, the full test suite passes, and all 308 gallery examples produce identical output.",
   "headline": "Combining charts with |, & and + no longer leaks a chart's filter onto the others"
  },
+ "https://github.com/vega/altair/pull/4169": {
+  "bug": "polars 2.0 changed how it reads a CSV from an in-memory buffer: it now starts reading wherever the buffer was left, not at the beginning. Altair's dataset loader writes data into a buffer and then reads it back without moving to the start, so polars 2.0 saw nothing and failed with \"empty CSV\". Every JSON sample dataset failed to load through the polars, pyarrow or pandas backends (issue #4168).",
+  "fix": "One line moves back to the start of the buffer before reading it. On polars 2.0 the test suite went from 28 failures to none, and it still passes on the older polars the project locks.",
+  "headline": "Loading Altair's sample datasets works again with polars 2.0"
+ },
  "https://github.com/vuejs/core/pull/15756": {
   "bug": "Vue runs some watchers \"before render\" (pre watchers) in a fixed order. If code inside one of those watchers mounted a new app, Vue flushed every waiting pre watcher at that moment, including ones that belonged to other parts of the page and should have run later. Work then ran out of order (issue #6728).",
   "fix": "When an app is mounted inside a running watcher, Vue now flushes only the watchers that belong to the components that mount just created, and leaves every other waiting watcher where it was. A test that failed before the change now passes, and the full test suite passes.",
