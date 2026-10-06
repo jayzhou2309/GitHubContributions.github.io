@@ -355,7 +355,7 @@
  },
  "https://github.com/psf/black/pull/5492": {
   "bug": "With `--preview`, Black can drop the parentheses around the right-hand side of an assignment when that side holds a dict whose value Black wraps in its own parentheses. The first line then ends up 96 characters long, past the 88 limit (issue #5488). Normal (stable) style does not have this bug.",
-  "fix": "Black has a fallback that retries a too-long line with the right-hand side wrapped in parentheses. A check meant to skip that retry was fooled by the dict value's own parentheses, so the retry never ran. The check now looks only at the outer parentheses when the preview feature is on. The output now matches stable style's shape and fits the line limit. One existing test expectation had the same overlong line and was corrected. Stable style is unchanged.",
+  "fix": "Black has a fallback that retries a too-long line with the right-hand side wrapped in parentheses. A check meant to skip that retry was fooled by the dict value's own parentheses, so the retry never ran. The check now looks only at the outer parentheses. It started as a preview-only change, and after a maintainer asked, it now applies in every mode, since it changes no stable-style output. The output now matches stable style's shape and fits the line limit. One existing test expectation had the same overlong line and was corrected. Stable style is unchanged.",
   "headline": "Parentheses dropped around a long assignment when a dict value gets wrapped"
  },
  "https://github.com/recharts/recharts/pull/7906": {
