@@ -383,6 +383,11 @@
   "fix": "The position-based guess is removed, as planned in the issue thread. A line with no point at the hovered spot now stays out of the tooltip and gets no highlight dot, as it did in version 3.10.0. New tests failed before the change and pass after it. The wider tooltip and chart tests (4382) and the type checks pass. Another open PR (#7083) adds a similar guess in the same place, so the two conflict, and the PR description says so.",
   "headline": "A chart line with fewer points shows a wrong value in the tooltip"
  },
+ "https://github.com/recharts/recharts/pull/7921": {
+  "bug": "When the category axis hides duplicate categories, a line chart places each point on its category tick by reading the point's category. That lookup only worked for a plain field name. With a nested field (`category.name`), a function, or the field `0`, the point never found its tick, fell back to its position, and a repeated category vanished off the chart (issue #7920).",
+  "fix": "The line now reads each point's category the same way the axis reads it when it builds the ticks. Plain field names and charts that show duplicate categories behave as before. A new test with all four kinds of key fails for three of them before the fix and passes for all four after it. The wider chart tests and the type checks pass.",
+  "headline": "A line drops repeated categories when the axis key is nested, a function, or 0"
+ },
  "https://github.com/transact-rs/sqlx/pull/4429": {
   "bug": "a SQLite query using `$0` as a bind parameter panicked instead of returning an error, because SQLite parameter numbers start at 1.",
   "fix": "`sqlx-sqlite/src/arguments.rs` now returns a protocol error for `$0`. A new test, `it_rejects_dollar_zero_parameter` in `tests/sqlite/sqlite.rs`, checks the error and confirms the connection still works afterward.",
