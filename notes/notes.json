@@ -49,6 +49,11 @@
   "fix": "Pull the message text out of the record before using it as the name, the same way another helper in that file already does. Inputs stored in other shapes behave as before.",
   "headline": "Session names show raw JSON instead of the user's message"
  },
+ "https://github.com/ant-design/ant-design/pull/59419": {
+  "bug": "In a form built from repeating rows (`Form.List`), some fields are drawn without their own label or error area (`noStyle`) and hand their errors to the surrounding field. When an earlier row was removed, the remaining rows moved up by one, but the surrounding field kept the error under the row's old position and added a second copy under the new one. The user then saw the same \"is required\" error twice, and the old copy stayed even after they filled the field (issue #54119).",
+  "fix": "Each such field now remembers the position it last reported its error under. When its position changes, it first clears the old entry, then reports under the new one, and when it is removed it clears the entry it actually left behind. A new test follows the steps from the issue: it shows both errors before the change and only the right one after, and the error goes away once the field is filled. All form tests, the type check and the linters pass.",
+  "headline": "A form field no longer keeps an old error after an earlier list row is removed"
+ },
  "https://github.com/apache/echarts/pull/21767": {
   "bug": "A map chart that reads its data from a `dataset` with `seriesLayoutBy: 'row'` throws an error and draws nothing (issue #21520). The map code always adds the regions that have no data, and that step is not allowed for row-laid-out data, even when there is nothing to add. A dataset that leaves some regions out could also lose region names.",
   "fix": "The map code only adds missing regions when there are some, and adds them in a way that works for both layouts. Region names stay correct. A unit test covers both cases.",
