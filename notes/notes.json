@@ -338,6 +338,11 @@
   "fix": "Two places in the string handling copied the line's comments and then added them again. The fix stops the extra copy, so each comment appears once.",
   "headline": "Comments printed twice when long-string handling rewrites a line"
  },
+ "https://github.com/psf/black/pull/5492": {
+  "bug": "With `--preview`, Black can drop the parentheses around the right-hand side of an assignment when that side holds a dict whose value Black wraps in its own parentheses. The first line then ends up 96 characters long, past the 88 limit (issue #5488). Normal (stable) style does not have this bug.",
+  "fix": "Black has a fallback that retries a too-long line with the right-hand side wrapped in parentheses. A check meant to skip that retry was fooled by the dict value's own parentheses, so the retry never ran. The check now looks only at the outer parentheses when the preview feature is on. The output now matches stable style's shape and fits the line limit. One existing test expectation had the same overlong line and was corrected. Stable style is unchanged.",
+  "headline": "Parentheses dropped around a long assignment when a dict value gets wrapped"
+ },
  "https://github.com/recharts/recharts/pull/7906": {
   "bug": "Charts can be moved through with the keyboard: arrow keys step the tooltip from one data point to the next. But if the mouse pointer happened to sit still over the chart, the keys did nothing. The tooltip stayed stuck on the point under the mouse, because the chart always let the mouse win over the keyboard (issue #7905). Keyboard users and automated tests that leave the pointer over a chart were both affected.",
   "fix": "Whichever input was used last now wins. A key press (left, right, or Enter) clears the mouse's hold on the tooltip and moves it. Moving the mouse again hands control back to the mouse, as before. Just clicking or focusing the chart does not reset the tooltip to the first point. A first version did that by mistake, and an existing test caught it. New tests failed before the change and pass after it. The wider test suite (5000 tests) and the type checks pass.",
