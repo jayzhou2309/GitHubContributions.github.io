@@ -313,6 +313,11 @@
   "fix": "When OpenClaw sends Astra a turn with tools on OpenAI's own endpoint, it leaves out the reasoning effort setting. Turns without tools keep the setting. This is the same rule OpenClaw already applies to GPT-5.5.",
   "headline": "Astra fails on any turn that uses tools"
  },
+ "https://github.com/openclaw/openclaw/pull/166165": {
+  "bug": "A user sends an image and the agent describes it correctly. On a later turn (Codex harness), OpenClaw reloads the earlier image. If that reload fails, OpenClaw puts a note inside the old message telling the model to say it never saw the image and to ask for a resend. The model then takes back its correct earlier answer (issue #166134).",
+  "fix": "When an earlier image cannot be reloaded, OpenClaw now adds a neutral note that the image is not included, instead of the resend instruction. An image that fails on the current turn still gets the resend instruction. Why the reload fails is left alone, because changing which folders may be read is a security choice.",
+  "headline": "The agent takes back an earlier image answer when the image cannot be reloaded"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
