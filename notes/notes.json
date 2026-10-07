@@ -438,6 +438,11 @@
   "fix": "The installer already marks the other tools it needs as runnable after unpacking them. It now does the same for `llama-fit-params`, and only when the file is there, since older downloads don't include it. A new test failed before the change and passes after it.",
   "headline": "On Macs, Studio shrinks the model's context because a helper tool can't run"
  },
+ "https://github.com/unslothai/unsloth/pull/12957": {
+  "bug": "Some model files store their weights in a squeezed 4-bit form, with a small table of scale numbers next to them. Unsloth swaps in a fast loader for these weights after checking only part of the file's shape. It never checks that the scale table has the size the file's settings promise. When the two disagree, the fast loader reads past the end of the table. The model then gives wrong answers, NaN values, or crashes the GPU, and nothing says the file is broken.",
+  "fix": "The fast loader now also checks the scale table's size. If it does not match, the weight is left to the slower normal path, which already refuses the mismatch with a clear shape error. A broken file now fails when it loads instead of quietly training on garbage.",
+  "headline": "A broken compressed checkpoint loads and then gives garbage output"
+ },
  "https://github.com/vega/altair/pull/4163": {
   "bug": "When a chart that was already built from other charts had its own filter (a \"transform\"), adding another chart to it with `|`, `&` or `+` placed the new chart inside the same group. The filter then applied to the new chart as well, so it showed the wrong data or came out empty, with no error (issue #3141).",
   "fix": "When the left-hand chart carries a filter, these operators now wrap it as its own group and put the new chart beside it, the same as `alt.hconcat`, `alt.vconcat`, `alt.concat` and `alt.layer` already do. Charts without a filter combine exactly as before. New tests failed before the change and pass after it, the full test suite passes, and all 308 gallery examples produce identical output.",
