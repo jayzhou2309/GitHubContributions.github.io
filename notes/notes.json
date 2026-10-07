@@ -348,6 +348,11 @@
   "fix": "When this step fails, OpenClaw now writes one warning at the normal log level. It names the step, the session, the model the shrink step really used (a separate summary model when one is configured), and the kind of failure, such as a rate limit, overload, or login problem. The same details now appear on the existing warning for automatic shrinking during a conversation. Neither warning copies the provider's raw error text, so no prompt text can leak into the log. The reply still fails exactly as before.",
   "headline": "A failed preflight compaction gives no reason at normal log levels"
  },
+ "https://github.com/openclaw/openclaw/pull/166490": {
+  "bug": "When OpenClaw runs Codex, it sets up small \"relays\" so Codex's hooks can talk back to it. When the Gateway rotates its lifecycle (a kind of soft restart), relays from before the rotation lose their permission to act, but they were not removed. They stayed registered, with their listener, timer, and records, until they timed out or something else cleaned them up (issue #128411).",
+  "fix": "Each relay now remembers which lifecycle it was created in. When the lifecycle rotates, OpenClaw removes every relay from an older lifecycle, using the same removal path it already uses elsewhere. Relays created during or after the rotation keep working. What Codex sees when it calls a removed relay does not change: it is still told the action is denied.",
+  "headline": "Old hook relays stay installed after the Gateway restarts its lifecycle"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
