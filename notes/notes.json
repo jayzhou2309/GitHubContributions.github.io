@@ -74,6 +74,11 @@
   "fix": "The radius axis now reads both options and flips ticks and labels to the other side when they are set, the same way the other axes do. A unit test checks both settings.",
   "headline": "Radius axis ignores the \"inside\" option for ticks and labels"
  },
+ "https://github.com/apache/echarts/pull/21782": {
+  "bug": "A chart with two y axes, where the toolbox zoom is set to control only one of them, throws \"Cannot read properties of undefined (reading 'findRepresentativeAxisProxy')\" as soon as the user drags a zoom box (issue #19402). The zoom code walks every pair of x and y axes and tries to use the zoom controller of an axis that has none.",
+  "fix": "The zoom code skips an axis that has no zoom controller, so the box zooms the axes that do have one. A unit test reproduces the crash from the issue and passes with the fix.",
+  "headline": "Toolbox zoom crashes when only some axes have a dataZoom"
+ },
  "https://github.com/celery/celery/pull/10750": {
   "bug": "With `task_always_eager` on, a group that holds a chain ending in another group still connected to the result backend. If Redis was down, the whole call failed with a retry-limit error, even though eager mode should never need the backend.",
   "fix": "When a group runs eagerly, it no longer \"freezes\" its members first. Freezing was what built the inner group's result and subscribed to the backend, and the eager path threw that result away anyway. The normal async path is unchanged.",
