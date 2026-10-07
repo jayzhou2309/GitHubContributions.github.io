@@ -343,6 +343,11 @@
   "fix": "When the delete rebuilt the config, it left a few empty settings behind. The check that decides which file a change belongs to counted those empty settings as changes to the main file, so it refused the write. The check now treats a missing setting and an empty one as the same thing. Real additions and removals are still checked as before. A new test that writes real files fails before the fix and passes after it.",
   "headline": "Deleting an agent fails when the agent list lives in an included file"
  },
+ "https://github.com/openclaw/openclaw/pull/166448": {
+  "bug": "Before replying, OpenClaw sometimes has to shrink (compact) a long conversation first. If that step fails, the reply fails with a generic error. The reason it failed is only written when verbose logging is on, so operators can't tell which step failed or why (issue #166438).",
+  "fix": "When this step fails, OpenClaw now writes one warning at the normal log level. The warning names the step, the session, the provider and model, and the kind of failure (for example a timeout or a provider error). The reply still fails exactly as before.",
+  "headline": "A failed preflight compaction gives no reason at normal log levels"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
