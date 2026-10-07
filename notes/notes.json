@@ -353,6 +353,11 @@
   "fix": "Each relay now remembers which lifecycle it was created in. When the lifecycle rotates, OpenClaw removes every relay from an older lifecycle, using the same removal path it already uses elsewhere. Relays created during or after the rotation keep working. What Codex sees when it calls a removed relay does not change: it is still told the action is denied.",
   "headline": "Old hook relays stay installed after the Gateway restarts its lifecycle"
  },
+ "https://github.com/openclaw/openclaw/pull/166522": {
+  "bug": "When recurring heartbeats are turned off (`heartbeat.every` set to `0m`), a posted or removed Android notification is queued for the agent but never starts a turn. The heartbeat docs promise that a targeted event like this still wakes its session once (issue #166508).",
+  "fix": "The check that decides whether an event may wake a session with heartbeats off only accepted notification wakes in the shape other senders use. The Android node sends them in a slightly different shape, so they were dropped. The check now also accepts that exact shape, and still requires a target session. Nothing else changes.",
+  "headline": "Android notification wakes are dropped when recurring heartbeats are off"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
