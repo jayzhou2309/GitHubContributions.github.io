@@ -358,6 +358,11 @@
   "fix": "The check that decides whether an event may wake a session with heartbeats off only accepted notification wakes in the shape other senders use. The Android node sends them in a slightly different shape, so they were dropped. The check now also accepts that exact shape, and still requires a target session. Nothing else changes.",
   "headline": "Android notification wakes are dropped when recurring heartbeats are off"
  },
+ "https://github.com/openclaw/openclaw/pull/166555": {
+  "bug": "In a Telegram direct chat you can split the conversation into topics. When you picked a model with `/model` in the main chat, a new topic that had no model of its own quietly used that same model instead of the configured default. OpenClaw guessed a topic's \"parent\" conversation from the shape of its internal name, and for DM topics that guess pointed at the main chat.",
+  "fix": "Telegram already knows when a conversation is a DM topic, so it now says so directly: a DM topic has no parent to borrow a model from. OpenClaw honours that instead of guessing. Each DM topic keeps its own `/model` choice, and a topic without one uses the default. Replies, `/status`, and the `/think`, `/fast`, and `/login` menus all agree. Other channels' threads and Telegram group topics still borrow from their parent as before. New tests failed before the change and pass after it.",
+  "headline": "A new Telegram DM topic uses the model picked in the main DM"
+ },
  "https://github.com/plotly/plotly.py/pull/5779": {
   "bug": "Each call to `add_annotation`, `add_shape`, `add_layout_image` or `add_selection` rebuilt and re-checked every object already on the figure. Adding 1000 annotations one by one took about 25 seconds (issue #5316).",
   "fix": "A new append path checks only the new object and keeps the existing ones as they are. Adding 1000 annotations now takes about 0.05 seconds. Inside `batch_update()` the old path still runs, so batch behavior does not change.",
