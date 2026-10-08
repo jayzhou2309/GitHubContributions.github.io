@@ -10,6 +10,8 @@ import os
 import re
 import subprocess
 import sys
+import time
+import urllib.error
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -48,14 +50,25 @@ def token():
     return subprocess.check_output(["gh", "auth", "token"], text=True).strip()
 
 
+RETRIES = 4
+
+
 def graphql(variables, tok):
     req = urllib.request.Request(
         "https://api.github.com/graphql",
         data=json.dumps({"query": QUERY, "variables": variables}).encode(),
         headers={"Authorization": f"bearer {tok}", "Content-Type": "application/json"},
     )
-    with urllib.request.urlopen(req) as r:
-        out = json.load(r)
+    for attempt in range(RETRIES):
+        try:
+            with urllib.request.urlopen(req) as r:
+                out = json.load(r)
+            break
+        except urllib.error.HTTPError as e:
+            # GitHub's API returns brief 502s; one used to fail the scheduled build.
+            if e.code not in (502, 503, 504) or attempt == RETRIES - 1:
+                raise
+            time.sleep(2 ** attempt * 5)
     if out.get("errors"):
         sys.exit(f"graphql errors: {out['errors']}")
     return out["data"]["search"]
