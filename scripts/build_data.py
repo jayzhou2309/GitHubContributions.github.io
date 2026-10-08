@@ -190,7 +190,9 @@ def main():
     if sys.argv[1:2] == ["--sync-notes"]:
         oss = os.environ.get("OSS_ROOT", str(Path.home() / "Documents/GitHub/oss"))
         NOTES.parent.mkdir(exist_ok=True)
-        NOTES.write_text(json.dumps(extract_notes(oss), indent=1, sort_keys=True) + "\n")
+        # Merge, so a PR whose doc is gone (e.g. a rebuilt oss workspace) keeps its published note.
+        notes = {**load_notes(), **extract_notes(oss)}
+        NOTES.write_text(json.dumps(notes, indent=1, sort_keys=True) + "\n")
         print(f"wrote {NOTES.relative_to(ROOT)}")
         return
     notes = load_notes()
