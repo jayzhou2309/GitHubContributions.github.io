@@ -16,25 +16,35 @@
  "https://github.com/MemPalace/mempalace/pull/2712": {
   "headline": "The session checkpoint skips messages the desktop app writes for itself"
  },
+ "https://github.com/NousResearch/hermes-agent/pull/125366": {
+  "headline": "Store repeated reasoning text only once"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/125415": {
+  "headline": "Stop treating Python scripts as shell code in the safety scan"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/125445": {
+  "headline": "End the turn when the AI keeps sending broken tool requests"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/125469": {
+  "headline": "Add a test for the crash when updating the cua-driver tool"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/125478": {
+  "headline": "Stop file search from failing at random on macOS"
+ },
  "https://github.com/NousResearch/hermes-agent/pull/127061": {
-  "bug": "After an update, Hermes checks its `state.db` database. If the check fails, it copies the pre-update snapshot back over it. On macOS, a database that another process held locked failed the check. The step that should spot that other process only worked on Linux, so Hermes copied the old snapshot over the healthy database and lost the newer rows (issue #127010, reported by Froraut).",
-  "fix": "The guard now uses a holder scan that works on Linux, macOS and Windows. If something still holds the database, Hermes refuses to restore and names the process. If nothing holds it, the restore runs as before. The refusal message no longer says \"restored copy also failed\" when nothing was copied.",
-  "headline": "Update guard overwrote a healthy database on macOS"
+  "headline": "Do not overwrite a database that is still in use after an update on macOS"
  },
  "https://github.com/NousResearch/hermes-agent/pull/127162": {
-  "bug": "Each skill is a `SKILL.md` file that starts with a header listing its name, description, and limits such as which platforms it runs on. When Hermes built its list of skills, it read only the first 4000 characters of each file. If the header ran longer than that, Hermes saw no header at all. The skill then lost its limits, so it showed up everywhere, and it got the wrong name and description (issue #127106).",
-  "fix": "Hermes now reads the whole header when it builds the skill list. A new test with two skills whose headers run past 5000 characters failed before the fix and passes after it.",
-  "headline": "Skills with long headers lost their platform limits"
+  "headline": "Read the full settings block of each skill file"
  },
  "https://github.com/NousResearch/hermes-agent/pull/127404": {
-  "bug": "When a chat platform's live-typing helper received nothing during a reply, Hermes still logged a \"possible duplicate send\" warning, once per reply. Users got exactly one message each time, so the warning was a false alarm. It trained operators to ignore the one warning meant to catch real double messages (issue #127395, seen on Feishu).",
-  "fix": "The warning now fires only if the live-typing helper actually put text in the chat this turn. A later fix keeps the warning when a reply was split into several messages, since the first part is already in the chat even after the helper resets for the next part.",
-  "headline": "False \"possible duplicate send\" warning on every reply"
+  "headline": "Stop a false \"possible duplicate send\" warning on every reply"
  },
  "https://github.com/NousResearch/hermes-agent/pull/127790": {
-  "bug": "Hermes lets you give a model a short nickname (an alias such as `ds`) and set that nickname as your default model. Chat translates the nickname into the real model name. The background helper tasks (goal checks, compression, memory flush, image reading) did not. They sent the literal nickname to the provider, which rejected it, and the goal loop paused itself after five failures (issue #127785).",
-  "fix": "The background tasks now look the nickname up the same way chat does and use the real model name, endpoint, and key it points to. That covers the normal automatic route, the image route, and the last-resort fallback that runs after a configured helper provider fails.",
-  "headline": "Background tasks sent a model nickname instead of the real model name"
+  "headline": "Use the real model name for background tasks when a nickname is set"
+ },
+ "https://github.com/NousResearch/hermes-agent/pull/127812": {
+  "headline": "Hide the terminal pet in the full screen view when it is turned off"
  },
  "https://github.com/QuantConnect/Lean/pull/9840": {
   "bug": "on a cash account, when a stock was delisted, the engine sold it but the sale money never settled. The settlement step only looked at securities still in the algorithm, and the delisted one had just been removed. The money stayed \"unsettled\" for the rest of the backtest, so the strategy could not spend it (issue #9838).",
