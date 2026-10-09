@@ -417,6 +417,9 @@
  "https://github.com/unslothai/unsloth/pull/13125": {
   "headline": "Stop the installer printing a \"No such file\" error on some Linux kernels"
  },
+ "https://github.com/unslothai/unsloth/pull/13142": {
+  "headline": "Keep the export Save folder field as the user types it"
+ },
  "https://github.com/vega/altair/pull/4163": {
   "headline": "Keep a chart's filter from spreading to charts joined with `|`, `&`, or `+`"
  },
