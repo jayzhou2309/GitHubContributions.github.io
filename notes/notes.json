@@ -414,6 +414,9 @@
  "https://github.com/unslothai/unsloth/pull/12957": {
   "headline": "Refuse the fast 4-bit path when a model's scale table has the wrong size"
  },
+ "https://github.com/unslothai/unsloth/pull/13125": {
+  "headline": "Stop the installer printing a \"No such file\" error on some Linux kernels"
+ },
  "https://github.com/vega/altair/pull/4163": {
   "headline": "Keep a chart's filter from spreading to charts joined with `|`, `&`, or `+`"
  },
