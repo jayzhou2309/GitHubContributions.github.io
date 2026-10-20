@@ -57,14 +57,10 @@
   "headline": "Evict a cached zip whose read fails so the next fetch re-opens it (closed)"
  },
  "https://github.com/agno-agi/agno/pull/10644": {
-  "bug": "To compute metrics, agno loaded every session in the time window and then sent all of their ids back to the database as one long list of query parameters. With enough sessions the database refuses the query: SQLite fails with \"too many SQL variables\", and async Postgres fails past 65,535 parameters. On Postgres the error is swallowed, so metrics quietly report zero sessions.",
-  "fix": "Let the database pick the ids itself with a subquery built from the same session filter, so the query stays the same size no matter how many sessions there are. The change covers all seven SQL storage adapters.",
-  "headline": "Metrics refresh breaks on large session tables"
+  "headline": "Stop the metrics refresh breaking on databases with many sessions"
  },
  "https://github.com/agno-agi/agno/pull/10721": {
-  "bug": "When a session's first run has no saved messages (for example a run that crashed early), agno names the session from the run's input. That input is stored as a small record, and agno turned the whole record into text, so the session list showed something like `{\"input_content\": \"Why is it slow?\", ...}` instead of \"Why is it slow?\".",
-  "fix": "Pull the message text out of the record before using it as the name, the same way another helper in that file already does. Inputs stored in other shapes behave as before.",
-  "headline": "Session names show raw JSON instead of the user's message"
+  "headline": "Name a session from what the user typed, not raw JSON"
  },
  "https://github.com/ant-design/ant-design/pull/59419": {
   "bug": "In a form built from repeating rows (`Form.List`), some fields are drawn without their own label or error area (`noStyle`) and hand their errors to the surrounding field. When an earlier row was removed, the remaining rows moved up by one, but the surrounding field kept the error under the row's old position and added a second copy under the new one. The user then saw the same \"is required\" error twice, and the old copy stayed even after they filled the field (issue #54119).",
